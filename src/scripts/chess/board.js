@@ -6,7 +6,9 @@ class Board {
         this.whitePieces = [];
         this.blackPieces = [];
         this.size = size;
+        this.imgs = imgs;
         this.setupPieces(imgs)
+
     }
     
     setupPieces(imgs) {
@@ -37,6 +39,7 @@ class Board {
             this.blackPieces.push(new Pawn(i, 6, false, imgs));
         }
 
+        
         return;
         
     }
@@ -92,11 +95,11 @@ class Board {
 
     clone() {
         let i;
-        let ret = new Board(this.size);
+        let ret = new Board(this.size, this.imgs);
         ret.whitePieces = [];
         ret.blackPieces = [];
-        for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone());
-        for(i = 0; i<this.blackPieces.length; i++) ret.blackPieces.push(this.blackPieces[i].clone());
+        for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone(this.imgs));
+        for(i = 0; i<this.blackPieces.length; i++) ret.blackPieces.push(this.blackPieces[i].clone(this.imgs));
         return ret;
     }
 

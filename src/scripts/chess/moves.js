@@ -8,6 +8,8 @@ class Move {
         this.del_xy = this.d
         if (del_d != null) this.del_xy = del_d;
         this.directionVector = createVector(this.d.x / Math.abs(this.d.x), this.d.y / Math.abs(this.d.y));
+        if (isNaN(this.directionVector.y)) this.directionVector.y = 0;
+        if (isNaN(this.directionVector.x)) this.directionVector.x = 0; 
     }
 
     getNewVector(vector) {
@@ -50,7 +52,9 @@ class Move {
 
     isMovingThroughPieces(vector, board) {
         let i = 1;
+
         const newVec = this.getNewVector(vector);
+
 
         while (i*this.directionVector.x + vector.x !== newVec.x ||
                 i*this.directionVector.y + vector.y !== newVec.y

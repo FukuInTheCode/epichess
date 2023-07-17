@@ -63,7 +63,7 @@ class MyClient {
 
         const listedBoard = this.gameManager.board.boardToList();
 
-        this.gameManager.isPlayerTurn = false;
+        // this.gameManager.isPlayerTurn = false;
         this.socket.emit('hasPlayed', (listedBoard));
         if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
         else this.uiHandler.updateHTMLPlayerStatus('White turn!');

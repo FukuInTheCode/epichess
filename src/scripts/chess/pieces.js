@@ -85,8 +85,8 @@ class King extends Piece {
     }
 
     
-    clone() {
-        return new King(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        return new King(this.vector.x, this.vector.y, this.isWhite, imgs);
     }
 
     isAttacked(board) {
@@ -131,8 +131,8 @@ class Queen extends Piece{
         }
     }
 
-    clone() {
-        return new Queen(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        return new Queen(this.vector.x, this.vector.y, this.isWhite, imgs);
     }
 
 }
@@ -152,8 +152,8 @@ class Bishop extends Piece {
         }
     }
 
-    clone() {
-        return new Bishop(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        return new Bishop(this.vector.x, this.vector.y, this.isWhite, imgs);
     }
 }
 
@@ -172,8 +172,8 @@ class Rook extends Piece {
         }
     }
 
-    clone() {
-        return new Rook(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        return new Rook(this.vector.x, this.vector.y, this.isWhite, imgs);
     }
 }
 
@@ -192,8 +192,8 @@ class Knight extends Piece {
         }
     }
 
-    clone() {
-        return new Knight(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        return new Knight(this.vector.x, this.vector.y, this.isWhite, imgs);
     }
 
 }
@@ -221,8 +221,8 @@ class Pawn extends Piece {
     }
         
 
-    clone() {
-        let ret = new Pawn(this.vector.x, this.vector.y, this.isWhite);
+    clone(imgs) {
+        let ret = new Pawn(this.vector.x, this.vector.y, this.isWhite, imgs);
 
         ret.firstMove = this.firstMove;
 

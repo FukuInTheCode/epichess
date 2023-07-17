@@ -45,7 +45,7 @@ class GameManager {
         this.dragged.isDragged = false;
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
             if (this.dragged.move(this.board, sketch.client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
-                sketch.client.uiHandler.show(sketch.client, sketch);
+                sketch.client.uiHandler.show(sketch);
                 sketch.client.sendData();
             }
         }
