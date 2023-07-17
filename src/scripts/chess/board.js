@@ -158,7 +158,7 @@ class Board {
         };
 
         for (let i = 0; i<list.length; i++) {
-            let tmpPiece = new letterToClassDict[list[i][0]](list[i][2].x, list[i][2].y, list[i][1]);
+            let tmpPiece = new letterToClassDict[list[i][0]](list[i][2].x, list[i][2].y, list[i][1], this.imgs);
             tmpPiece.firstMove = list[i][3];
             tmpPiece.enPassantVulnerable = list[i][4];
             if (list[i][1]) this.whitePieces.push(tmpPiece);

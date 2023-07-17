@@ -1,6 +1,7 @@
 class UIHandler {
     constructor(tilesize) {
         this.tilesize = tilesize;
+        this.clientStatus = "";
     }
 
         
@@ -11,8 +12,7 @@ class UIHandler {
     }
 
     updateHTMLPlayerStatus(status) {
-        status
-        // document.getElementById('playerGameStatus').innerHTML = status;
+        document.getElementById('PlayerGameStatus').innerHTML = status;
         return;
     }
 

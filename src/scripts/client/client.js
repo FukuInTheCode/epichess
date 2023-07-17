@@ -10,7 +10,7 @@ import io from 'socket.io-client'
 
 class MyClient {
     constructor(imgs) {
-        this.enemyID = 1;
+        this.enemyID = null;
         this.gameManager = new GameManager(imgs);
         this.uiHandler = new UIHandler(100);
         this.socket = io('http://192.168.1.34:3000', { transports: ['websocket'] });
@@ -63,7 +63,7 @@ class MyClient {
 
         const listedBoard = this.gameManager.board.boardToList();
 
-        // this.gameManager.isPlayerTurn = false;
+        this.gameManager.isPlayerTurn = false;
         this.socket.emit('hasPlayed', (listedBoard));
         if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
         else this.uiHandler.updateHTMLPlayerStatus('White turn!');

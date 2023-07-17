@@ -39,10 +39,17 @@ class GameManager {
 
 
     handleMouseReleased(sketch) {
-        if (sketch.client.enemyID === null) return;
+
         if (!this.dragged) return;
 
+        if (sketch.client.enemyID === null) {
+            this.dragged.isDragged = false;
+            return;
+        }
+
+
         this.dragged.isDragged = false;
+
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
             if (this.dragged.move(this.board, sketch.client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
                 sketch.client.uiHandler.show(sketch);

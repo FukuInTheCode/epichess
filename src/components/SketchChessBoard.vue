@@ -1,15 +1,26 @@
 <template>
-    <div ref="sketchContainer"></div>
-  </template>
+  <button class="PlayButton" ref="playButton" @click="this.sketch.client.clickPlayButton()">Play</button>
+  <div id="PlayerGameStatus">{{ clientStatus }}</div>
+  <div ref="sketchContainer"></div>
+</template>
   
   <script>
   import p5 from "p5";
-  import { MyClient } from '../scripts/client/client.js'
+  import { MyClient } from '../scripts/client/client.js';
   
   export default {
+
+    
+    data() {
+      return {
+        clientStatus: "HelloWorld",
+      }
+    },
+
     mounted() {
       this.sketch = new p5(this.createSketch, this.$refs.sketchContainer);
     },
+
     beforeUnmount() {
       this.sketch.remove();
     },
@@ -50,7 +61,7 @@
         }  
 
       },
-    },
+    }
   };
   </script>
   
@@ -58,6 +69,10 @@
   div {
     width: 100%;
     height: 100%;
+  }
+
+  .PlayButton {
+    background: 255;
   }
   </style>
   

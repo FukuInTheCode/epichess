@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <CursorCircle />
+    <SketchChessBoard />
   </div>
 </template>
 
 <script>
-import CursorCircle from "./components/CursorCircle.vue";
+import SketchChessBoard from "./components/SketchChessBoard.vue";
 
 export default {
   name: "App",
   components: {
-    CursorCircle,
+    SketchChessBoard,
   },
 };
 </script>
