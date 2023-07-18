@@ -180,6 +180,30 @@ class Board {
         }
         return true;
     }
+
+    hasEnoughtPieces(team) {
+        let pieces;
+
+        if(team) pieces = this.whitePieces;
+        else pieces = this.blackPieces;
+
+
+
+        if(pieces.length >= 3) return true;
+
+        if(pieces.length <= 1) return false;
+
+        for(const piece of pieces) {
+            if (piece.letter === 'K') continue;
+
+            if (piece.letter === 'B') return false;
+
+            if (piece.letter === 'N') return false;
+        }
+
+        return true;
+
+    }
 }
 
 export { Board };

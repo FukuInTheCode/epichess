@@ -1,6 +1,6 @@
-import { createVector } from "./vector.js";
+const { createVector } = require("./vector.js");
 
-import { Move, KnightMove, BasePawnMove, FirstPawnMove, TackingPawnMove, EnPassantMove, BasePromotionPawnMove, TackingPromotionPawnMove } from './moves.js';
+const { Move, KnightMove, BasePawnMove, FirstPawnMove, TackingPawnMove, EnPassantMove, BasePromotionPawnMove, TackingPromotionPawnMove } = require('./moves.js');
 
 
 class Piece {
@@ -41,10 +41,8 @@ class Piece {
     }
 
     move(board, tilesize, X, Y) {
-        console.log(X, Y)
         let mouseVector = createVector(Math.floor(X/tilesize), Math.floor(Y/tilesize));
         const validMoves = this.getValidMoves(mouseVector, board);
-        console.log(validMoves)
         if (validMoves.length === 1) {
             if (board.getPiecesByTeamAndType(this.isWhite, King)[0].isPutInCheck(this, validMoves[0], board)) return false;
             validMoves[0].doWhateverThisMoveDo(this, board);

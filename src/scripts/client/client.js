@@ -38,6 +38,10 @@ class MyClient {
             return;
         });
 
+        this.socket.on('patNotEnoughtMaterial', () => {
+            this.gameManager.handlePatByNotEnoughtMaterial(this)
+        })
+
         return;
     }
 
@@ -65,13 +69,18 @@ class MyClient {
 
         this.gameManager.isPlayerTurn = false;
         this.socket.emit('hasPlayed', (listedBoard));
+
+        
         if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
         else this.uiHandler.updateHTMLPlayerStatus('White turn!');
+
         return;
     }
 
     enemyDisconnected() {
         this.uiHandler.updateHTMLPlayerStatus('Won! Enemy disconnect!');
+        this.gameManager.handleEnemyDisconnected();
+        this.enemyID = null;
         return;
     }
 

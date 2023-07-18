@@ -16,17 +16,19 @@ class GameManager {
         this.isPlayerTurn = true;
         client.uiHandler.updateHTMLPlayerStatus('Your turn!');
         this.board.listToBoard(listedBoard);
-        this.checkmateCheck(client);
-        return;
-    }
-  
-    // Check if the player is checkmated
-    checkmateCheck(client) {
-        if (this.board.isCheckmated(this.isPlayerWhite)) {
+
+        
+        if (this.amICheckmated()) {
+            client.socket.emit('lostByCheckmate');
             this.handleLostByCheckmate(client);
-            client.socket.emit('isCheckmated');
         }
-        return; 
+
+        if (this.isPatByMaterial()) {
+            client.socket.emit('GameEndOnPat-NEM')
+            this.handlePatByNotEnoughtMaterial(client);
+        }
+
+        return;
     }
 
     handleMousePressed(sketch) {
@@ -62,7 +64,7 @@ class GameManager {
   
     // Event handler for when the enemy disconnects
     handleEnemyDisconnected() {
-      // ...
+        this.isPlayerTurn = false;
       return;
     }
   
@@ -86,6 +88,26 @@ class GameManager {
         client.enemyID = null;
         this.isPlayerTurn = false;
         return;
+    }
+
+    handlePatByNotEnoughtMaterial(client) {
+        client.uiHandler.updateHTMLPlayerStatus('Pat! Not enought material! Nobody Win!');
+        client.enemyID = null;
+        this.isPlayerTurn = false;
+        return;
+    }
+
+    amICheckmated() {
+        return this.board.isCheckmated(this.isPlayerWhite);
+    }
+
+
+    isPatByMaterial() {
+
+        return !(
+            this.board.hasEnoughtPieces(true) ||
+            this.board.hasEnoughtPieces(false)
+        )
     }
   }
 

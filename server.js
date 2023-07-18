@@ -18,9 +18,17 @@ io.on('connection', (socket) => {
     console.log('User | ' + socket.id, 'disconnected');
 
     clients = clients.filter(client => client !== socket);
-    ClientIDGameQueue = ClientIDGameQueue.filter(client => client.id !== socket.id);
+    ClientIDGameQueue = ClientIDGameQueue.filter(clientID => clientID !== socket.id);
 
-  })
+    if (!socket.enemyID) return;
+
+    let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
+
+    tmpEnemy.enemyID = null;
+
+    tmpEnemy.emit('enemyDisconnected');
+
+  });
 
   socket.on('inResearch', () => {
     // check if a clients is already searching for a game and if not add the clients to the Queue
@@ -43,7 +51,7 @@ io.on('connection', (socket) => {
       ClientIDGameQueue.push(socket.id);
     }
 
-  })
+  });
 
   socket.on('hasPlayed', (listedBoard) => {
     if (socket.id === null) return;
@@ -51,9 +59,23 @@ io.on('connection', (socket) => {
     let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
 
     tmpEnemy.emit('enemyHasPlayed', listedBoard);
+  });
 
+  socket.on('lostByCheckmate', () => {
+    let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
+    tmpEnemy.emit('wonByCheckmate');
+    socket.enemyID = null;
+    tmpEnemy.enemyID = null;
+  });
 
-  })
+  socket.on('GameEndOnPat-NEM', () => {
+    let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
+    tmpEnemy.emit('patNotEnoughtMaterial');
+    socket.enemyID = null;
+    tmpEnemy.enemyID = null;
+
+  });
+
 });
 
 // Start the server
