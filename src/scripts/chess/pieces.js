@@ -45,6 +45,7 @@ class Piece {
         const validMoves = this.getValidMoves(mouseVector, board);
         if (validMoves.length === 1) {
             if (board.getPiecesByTeamAndType(this.isWhite, King)[0].isPutInCheck(this, validMoves[0], board)) return false;
+            board.AlgebraicNotationArray.push(validMoves[0].getAlgebraicNotation(this, board));
             validMoves[0].doWhateverThisMoveDo(this, board);
             return true;
         } else if (validMoves.length > 1) {

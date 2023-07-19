@@ -71,6 +71,66 @@ class Move {
         return false;
         
     }
+
+    getAlgebraicNotation(piece, board) {
+        let tmpPiecesOfSameType = board.getPiecesByTeamAndLetter(piece.isWhite, piece.letter).filter(p => !p.vector.equals(piece.vector));
+
+        let AlgebraicNotation = String.fromCharCode(97 + this.getNewVector(piece.vector).x) + (this.getNewVector(piece.vector).y + 1).toString();
+        
+        let prefix;
+        let suffix = '';
+        if(piece.letter === 'p') prefix = '';
+        else prefix = piece.letter;
+
+        // eslint-disable-next-line
+        let tmpAdditionBoolean = {
+            x: false,
+            y: false,
+            take: false,
+            check: false,
+            checkmate: false
+        }
+        // eslint-disable-next-line
+        let tmpAdditionString = {
+            x: String.fromCharCode(97 + piece.vector.x),
+            y: piece.vector.y.toString(),
+            take: 'x',
+            check: '+',
+            checkmate: '#'
+        }
+
+        let tmpPieceVectorWithSameMove = [];
+
+        for(const p of tmpPiecesOfSameType) {
+            // eslint-disable-next-line
+            for(const move of p.getValidMoves(this.getNewVector(piece.vector), board)) tmpPieceVectorWithSameMove.push(p.vector);
+        }
+
+        for(const vector of tmpPieceVectorWithSameMove) {
+            if(vector.x === piece.vector.x) tmpAdditionBoolean.y = true;
+            else if (vector.y === piece.vector.y) tmpAdditionBoolean.x = true;
+            else if(!tmpAdditionBoolean.x && !tmpAdditionBoolean.y) tmpAdditionBoolean.x = true;
+        }
+
+        if(board.isPieceAt(this.getNewVector(piece.vector))) tmpAdditionBoolean.take = true;
+
+        let tmpBoardCloned = board.clone();
+
+        this.doWhateverThisMoveDo(tmpBoardCloned.getPieceAt(piece.vector), tmpBoardCloned);
+
+        if(tmpBoardCloned.isCheckmated(!piece.isWhite)) tmpAdditionBoolean.checkmate = true;
+        else if(tmpBoardCloned.getPiecesByTeamAndLetter(!piece.isWhite, 'K')[0].isAttacked(tmpBoardCloned)) tmpAdditionBoolean.check = true;
+
+        if(tmpAdditionBoolean.x) prefix = prefix.concat(tmpAdditionString.x);
+        if(tmpAdditionBoolean.y) prefix = prefix.concat(tmpAdditionString.y);
+        if(tmpAdditionBoolean.take) prefix = prefix.concat(tmpAdditionString.take);
+        if(tmpAdditionBoolean.check) suffix = suffix.concat(tmpAdditionString.check);
+        if(tmpAdditionBoolean.checkmate) suffix = suffix.concat(tmpAdditionString.checkmate);
+
+        return (prefix + AlgebraicNotation + suffix);
+
+    }
+
 }
 
 class KnightMove extends Move {
@@ -251,6 +311,11 @@ class ShortCastle extends Move {
         board.getPieceAt(createVector(board.size -1, piece.vector.y)).vector = createVector(piece.vector.x - 1 , piece.vector.y);
         board.resetEnpassant(piece.isWhite);
     }
+
+    // eslint-disable-next-line
+    getAlgebraicNotation(piece, board) {
+        return 'O-O';
+    }
 }
 
 
@@ -285,6 +350,12 @@ class LongCastle extends ShortCastle {
         board.getPieceAt(createVector(0, piece.vector.y)).firstMove = false;
         board.getPieceAt(createVector(0, piece.vector.y)).vector = createVector(piece.vector.x + 1 , piece.vector.y);
         board.resetEnpassant(piece.isWhite);
+    }
+
+
+    // eslint-disable-next-line
+    getAlgebraicNotation(piece, board) {
+        return 'O-O-O';
     }
 }
 

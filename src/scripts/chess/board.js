@@ -7,7 +7,10 @@ class Board {
         this.blackPieces = [];
         this.size = size;
         this.imgs = imgs;
-        this.setupPieces(imgs)
+
+        this.AlgebraicNotationArray = [];
+        this.setupPieces(imgs);
+
 
     }
     
@@ -93,9 +96,17 @@ class Board {
         return ret;
     }
 
+    getPiecesByTeamAndLetter(team, letter) {
+        let ret = [];
+        for (const piece of this.getPiecesByTeam(team)) if (piece.letter === letter) ret.push(piece);
+        return ret;
+    }
+
+
     clone() {
         let i;
         let ret = new Board(this.size, this.imgs);
+        ret.AlgebraicNotationArray = this.AlgebraicNotationArray;
         ret.whitePieces = [];
         ret.blackPieces = [];
         for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone(this.imgs));
@@ -168,7 +179,7 @@ class Board {
         return;
 
     }
-    
+
     isCheckmated(team) {
         let tmpKing = this.getPiecesByTeamAndType(team, King)[0];
         for (const piece of this.getPiecesByTeam(team)) {

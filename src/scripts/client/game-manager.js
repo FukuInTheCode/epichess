@@ -12,10 +12,12 @@ class GameManager {
     }
   
     // Update the board with the received data
-    updateBoard(listedBoard, client) {
+    updateBoard(listedBoard, AlgebraicNotation, client) {
         this.isPlayerTurn = true;
         client.uiHandler.updateHTMLPlayerStatus('Your turn!');
         this.board.listToBoard(listedBoard);
+        this.board.AlgebraicNotationArray.push(AlgebraicNotation);
+        console.log(this.board.AlgebraicNotationArray);
 
         
         if (this.amICheckmated()) {
@@ -55,7 +57,9 @@ class GameManager {
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
             if (this.dragged.move(this.board, sketch.client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
                 sketch.client.uiHandler.show(sketch);
+                console.log(this.board.AlgebraicNotationArray);
                 sketch.client.sendData();
+ 
             }
         }
         this.dragged = null;

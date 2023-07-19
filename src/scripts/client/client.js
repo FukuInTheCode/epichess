@@ -28,8 +28,8 @@ class MyClient {
             return;
         });
 
-        this.socket.on('enemyHasPlayed', (listedBoard) => {
-            this.gameManager.updateBoard(listedBoard, this);
+        this.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {
+            this.gameManager.updateBoard(listedBoard, AlgebraicNotation, this);
             return;
         });
 
@@ -68,7 +68,7 @@ class MyClient {
         const listedBoard = this.gameManager.board.boardToList();
 
         this.gameManager.isPlayerTurn = false;
-        this.socket.emit('hasPlayed', (listedBoard));
+        this.socket.emit('hasPlayed', listedBoard, this.gameManager.board.AlgebraicNotationArray[this.gameManager.board.AlgebraicNotationArray.length - 1]);
 
         
         if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
