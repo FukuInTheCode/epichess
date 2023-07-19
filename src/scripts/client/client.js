@@ -9,11 +9,18 @@ import io from 'socket.io-client'
 
 
 class MyClient {
-    constructor(imgs) {
+    constructor() {
         this.enemyID = null;
+
+        this.clientStatus = "Idling";
+
+        this.socket = io('http://192.168.1.34:3000', { transports: ['websocket'] });
+        
+    }
+
+    setup(imgs) {
         this.gameManager = new GameManager(imgs);
         this.uiHandler = new UIHandler(100);
-        this.socket = io('http://192.168.1.34:3000', { transports: ['websocket'] });
         this.setListener();
     }
 
@@ -56,7 +63,7 @@ class MyClient {
     clickPlayButton() {
         if (this.enemyID !== null) return;
 
-        this.uiHandler.updateHTMLPlayerStatus('In research...');
+        this.uiHandler.updateHTMLPlayerStatus(this, 'In research...');
 
         this.socket.emit('inResearch');
         return;
@@ -71,15 +78,15 @@ class MyClient {
         this.socket.emit('hasPlayed', listedBoard, this.gameManager.board.AlgebraicNotationArray[this.gameManager.board.AlgebraicNotationArray.length - 1]);
 
         
-        if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
-        else this.uiHandler.updateHTMLPlayerStatus('White turn!');
+        if (this.gameManager.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus(this, 'Black turn!');
+        else this.uiHandler.updateHTMLPlayerStatus(this, 'White turn!');
 
         return;
     }
 
     enemyDisconnected() {
         if (this.enemyID === null) return;
-        this.uiHandler.updateHTMLPlayerStatus('Won! Enemy disconnect!');
+        this.uiHandler.updateHTMLPlayerStatus(this, 'Won! Enemy disconnect!');
         this.gameManager.handleEnemyDisconnected();
         this.enemyID = null;
         return;
@@ -88,14 +95,12 @@ class MyClient {
     enemyFound(enemyID, isPlayerWhite) {
         this.enemyID = enemyID;
         this.gameManager.handleEnemyFound(isPlayerWhite);
-        if (isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Game Found! Your Turn!');
-        else this.uiHandler.updateHTMLPlayerStatus('Game Found! White turn!');
+        if (isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus(this, 'Game Found! Your Turn!');
+        else this.uiHandler.updateHTMLPlayerStatus(this, 'Game Found! White turn!');
         return;
     }
 
     disconnectSocket() {
-
-        console.log(1);
         if (this.socket) {
             this.socket.disconnect();
         }

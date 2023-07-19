@@ -5,14 +5,14 @@ class UIHandler {
     }
 
         
-    show(sketch) {
-        sketch.client.gameManager.board.show(this.tilesize, sketch);
+    show(client, sketch) {
+        client.gameManager.board.show(this.tilesize, sketch);
         
         return;
     }
 
-    updateHTMLPlayerStatus(status) {
-        document.getElementById('PlayerGameStatus').innerHTML = status;
+    updateHTMLPlayerStatus(client, status) {
+        client.clientStatus = status;
         return;
     }
 

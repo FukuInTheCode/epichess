@@ -1,6 +1,6 @@
 <template>
-  <button class="PlayButton" ref="playButton" @click="this.sketch.client.clickPlayButton()">Play</button>
-  <div id="PlayerGameStatus">{{ clientStatus }}</div>
+  <button class="PlayButton" ref="playButton" @click="this.client.clickPlayButton()">Play</button>
+  <p id="PlayerGameStatus">{{ this.client.clientStatus }}</p>
   <div ref="sketchContainer"></div>
 </template>
   
@@ -13,7 +13,8 @@
     
     data() {
       return {
-        clientStatus: "HelloWorldy",
+        clientStatus: "HelloWorld",
+        client: new MyClient()
       }
     },
 
@@ -22,7 +23,7 @@
     },
 
     beforeUnmount() {
-      this.sketch.client.disconnectSocket()
+      this.client.disconnectSocket()
       this.sketch.remove();
     },
 
@@ -45,21 +46,21 @@
 
         sketch.setup = () => {
           sketch.createCanvas(800, 800);
-          sketch.client = new MyClient(sketch.imgs);
+          this.client.setup(sketch.imgs);
         };
   
         sketch.draw = () => {
           sketch.background(144);
-          sketch.client.uiHandler.show(sketch);
+          this.client.uiHandler.show(this.client, sketch);
 
         };
 
         sketch.mousePressed = () => {
-          sketch.client.gameManager.handleMousePressed(sketch);
+          this.client.gameManager.handleMousePressed(this.client, sketch);
         }
 
         sketch.mouseReleased = () => {
-          sketch.client.gameManager.handleMouseReleased(sketch);
+          this.client.gameManager.handleMouseReleased(this.client, sketch);
         }  
 
       },

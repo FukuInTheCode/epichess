@@ -14,7 +14,7 @@ class GameManager {
     // Update the board with the received data
     updateBoard(listedBoard, AlgebraicNotation, client) {
         this.isPlayerTurn = true;
-        client.uiHandler.updateHTMLPlayerStatus('Your turn!');
+        client.uiHandler.updateHTMLPlayerStatus(client, 'Your turn!');
         this.board.listToBoard(listedBoard);
         this.board.AlgebraicNotationArray.push(AlgebraicNotation);
         console.log(this.board.AlgebraicNotationArray);
@@ -33,8 +33,8 @@ class GameManager {
         return;
     }
 
-    handleMousePressed(sketch) {
-        let tmpMouseVector = createVector(Math.floor(sketch.mouseX/sketch.client.uiHandler.tilesize), Math.floor(sketch.mouseY/sketch.client.uiHandler.tilesize));
+    handleMousePressed(client, sketch) {
+        let tmpMouseVector = createVector(Math.floor(sketch.mouseX/client.uiHandler.tilesize), Math.floor(sketch.mouseY/client.uiHandler.tilesize));
         if (this.board.isPieceAt(tmpMouseVector)) {
             this.dragged = this.board.getPieceAt(tmpMouseVector);
             this.dragged.isDragged = true;
@@ -42,23 +42,22 @@ class GameManager {
     } 
 
 
-    handleMouseReleased(sketch) {
+    handleMouseReleased(client, sketch) {
 
         if (!this.dragged) return;
 
-        if (sketch.client.enemyID === null) {
+        if (client.enemyID === null) {
             this.dragged.isDragged = false;
             return;
         }
 
-
         this.dragged.isDragged = false;
 
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
-            if (this.dragged.move(this.board, sketch.client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
-                sketch.client.uiHandler.show(sketch);
+            if (this.dragged.move(this.board, client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
+                client.uiHandler.show(client, sketch);
                 console.log(this.board.AlgebraicNotationArray);
-                sketch.client.sendData();
+                client.sendData();
  
             }
         }
@@ -81,7 +80,7 @@ class GameManager {
   
     // Event handler for when the player is checkmated
     handleLostByCheckmate(client) {
-        client.uiHandler.updateHTMLPlayerStatus('lost! Checkmated!');
+        client.uiHandler.updateHTMLPlayerStatus(client, 'lost! Checkmated!');
         client.enemyID = null;
         this.isPlayerTurn = false;
         return;
@@ -89,14 +88,14 @@ class GameManager {
   
     // Event handler for when the enemy is checkmated
     handleWonByCheckmate(client) {
-        client.uiHandler.updateHTMLPlayerStatus('Won! Enemy is checkmated!');
+        client.uiHandler.updateHTMLPlayerStatus(client, 'Won! Enemy is checkmated!');
         client.enemyID = null;
         this.isPlayerTurn = false;
         return;
     }
 
     handlePatByNotEnoughtMaterial(client) {
-        client.uiHandler.updateHTMLPlayerStatus('Pat! Not enought material! Nobody Win!');
+        client.uiHandler.updateHTMLPlayerStatus(client, 'Pat! Not enought material! Nobody Win!');
         client.enemyID = null;
         this.isPlayerTurn = false;
         return;
