@@ -1,6 +1,6 @@
 const { createVector } = require("./vector.js");
 
-const { Move, KnightMove, BasePawnMove, FirstPawnMove, TackingPawnMove, EnPassantMove, BasePromotionPawnMove, TackingPromotionPawnMove } = require('./moves.js');
+const { Move, KnightMove, BasePawnMove, FirstPawnMove, TackingPawnMove, EnPassantMove, BasePromotionPawnMove, TackingPromotionPawnMove, ShortCastle, LongCastle } = require('./moves.js');
 
 
 class Piece {
@@ -80,6 +80,10 @@ class King extends Piece {
         else this.img = imgs[6];
         this.score = 1000;
 
+        this.moves.push(new ShortCastle(createVector(2, 0)));
+        this.moves.push(new LongCastle(createVector(-2, 0)));
+
+
     }
 
     
@@ -90,7 +94,8 @@ class King extends Piece {
     isAttacked(board) {
         for (const piece of board.getPiecesByTeam(!this.isWhite)) {
             for (const move of piece.moves) {
-                if (move.isValid(piece.vector, board, false) &&
+                if (move.isCastleMove) continue;
+                if (move.isValid(piece.vector, board) &&
                 move.getNewVector(piece.vector).equals(this.vector)
                 ) return true;
 

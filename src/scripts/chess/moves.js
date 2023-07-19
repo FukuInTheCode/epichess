@@ -10,6 +10,8 @@ class Move {
         this.directionVector = createVector(this.d.x / Math.abs(this.d.x), this.d.y / Math.abs(this.d.y));
         if (isNaN(this.directionVector.y)) this.directionVector.y = 0;
         if (isNaN(this.directionVector.x)) this.directionVector.x = 0; 
+
+        this.isCastleMove = false;
     }
 
     getNewVector(vector) {
@@ -47,6 +49,7 @@ class Move {
     doWhateverThisMoveDo(piece, board) {
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
+        piece.firstMove = false;
         board.resetEnpassant(piece.isWhite);
     }
 
@@ -215,6 +218,76 @@ class TackingPromotionPawnMove extends BasePromotionPawnMove {
     }
 }
 
+class ShortCastle extends Move {
+    constructor(d, del_d = null) {
+        super(d, del_d);
+        this.isCastleMove = true;
+    }
+
+    isValid(vector, board) {
+
+        let tmpKing = board.getPieceAt(vector).clone(board.imgs);
+        tmpKing.vector = tmpKing.vector.add(this.directionVector);
+
+        return (
+            this.isWithinBorder(this.getNewVector(vector), board) &&
+            !this.isMovingThroughPieces(vector, board) &&
+            board.getPieceAt(vector).letter === 'K' &&
+            board.getPieceAt(vector).firstMove &&
+            !board.getPieceAt(vector).isAttacked(board) &&
+            !tmpKing.isAttacked(board) &&
+            board.isPieceAt(createVector(board.size - 1, vector.y)) &&
+            board.getPieceAt(createVector(board.size - 1, vector.y)).letter === 'R' &&
+            board.getPieceAt(createVector(board.size - 1, vector.y)).firstMove
+
+        )
+    }
+
+    doWhateverThisMoveDo(piece, board) {
+        board.del(this.getNewDelVector(piece.vector));
+        piece.vector = this.getNewVector(piece.vector);
+        piece.firstMove = false;
+        board.getPieceAt(createVector(board.size -1, piece.vector.y)).firstMove = false;
+        board.getPieceAt(createVector(board.size -1, piece.vector.y)).vector = createVector(piece.vector.x - 1 , piece.vector.y);
+        board.resetEnpassant(piece.isWhite);
+    }
+}
+
+
+class LongCastle extends ShortCastle {
+    constructor(d, del_d = null) {
+        super(d, del_d);
+    }
+
+    isValid(vector, board) {
+
+        let tmpKing = board.getPieceAt(vector).clone(board.imgs);
+        tmpKing.vector = tmpKing.vector.add(this.directionVector);
+
+        return (
+            this.isWithinBorder(this.getNewVector(vector), board) &&
+            !this.isMovingThroughPieces(vector, board) &&
+            board.getPieceAt(vector).letter === 'K' &&
+            board.getPieceAt(vector).firstMove &&
+            !board.getPieceAt(vector).isAttacked(board) &&
+            !tmpKing.isAttacked(board) &&
+            board.isPieceAt(createVector(0, vector.y)) &&
+            board.getPieceAt(createVector(0, vector.y)).letter === 'R' &&
+            board.getPieceAt(createVector(0, vector.y)).firstMove
+
+        )
+    }
+
+    doWhateverThisMoveDo(piece, board) {
+        board.del(this.getNewDelVector(piece.vector));
+        piece.vector = this.getNewVector(piece.vector);
+        piece.firstMove = false;
+        board.getPieceAt(createVector(0, piece.vector.y)).firstMove = false;
+        board.getPieceAt(createVector(0, piece.vector.y)).vector = createVector(piece.vector.x + 1 , piece.vector.y);
+        board.resetEnpassant(piece.isWhite);
+    }
+}
+
 
 export {
     Move,
@@ -224,5 +297,7 @@ export {
     FirstPawnMove,
     EnPassantMove,
     BasePromotionPawnMove,
-    TackingPromotionPawnMove
+    TackingPromotionPawnMove,
+    ShortCastle,
+    LongCastle
   };

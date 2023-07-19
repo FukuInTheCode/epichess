@@ -166,9 +166,9 @@ class Board {
         }
 
         return;
+
     }
-
-
+    
     isCheckmated(team) {
         let tmpKing = this.getPiecesByTeamAndType(team, King)[0];
         for (const piece of this.getPiecesByTeam(team)) {

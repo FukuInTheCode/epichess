@@ -14,6 +14,13 @@ class Vector {
             this.y === vector.y
         )
     }
+
+    add(vector) {
+        return createVector(
+            this.x + vector.x,
+            this.y + vector.y
+        )
+    }
 } 
 
 export { createVector };
