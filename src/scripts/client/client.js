@@ -78,6 +78,7 @@ class MyClient {
     }
 
     enemyDisconnected() {
+        if (this.enemyID === null) return;
         this.uiHandler.updateHTMLPlayerStatus('Won! Enemy disconnect!');
         this.gameManager.handleEnemyDisconnected();
         this.enemyID = null;
@@ -89,6 +90,15 @@ class MyClient {
         this.gameManager.handleEnemyFound(isPlayerWhite);
         if (isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Game Found! Your Turn!');
         else this.uiHandler.updateHTMLPlayerStatus('Game Found! White turn!');
+        return;
+    }
+
+    disconnectSocket() {
+
+        console.log(1);
+        if (this.socket) {
+            this.socket.disconnect();
+        }
         return;
     }
 }

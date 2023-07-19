@@ -73,35 +73,50 @@ class Move {
     }
 
     getAlgebraicNotation(piece, board) {
-        let tmpPiecesOfSameType = board.getPiecesByTeamAndLetter(piece.isWhite, piece.letter).filter(p => !p.vector.equals(piece.vector));
-
         let AlgebraicNotation = String.fromCharCode(97 + this.getNewVector(piece.vector).x) + (this.getNewVector(piece.vector).y + 1).toString();
-        
-        let prefix;
-        let suffix = '';
-        if(piece.letter === 'p') prefix = '';
-        else prefix = piece.letter;
 
-        // eslint-disable-next-line
+        let prefix = this.getAlgebraicNotationPrefix(piece, board);
+        let suffix = this.getAlgebraicNotationSuffix(piece, board);
+
+        return (prefix + AlgebraicNotation + suffix);
+
+    }
+
+    getAlgebraicNotationSuffix(piece, board) {
+        let suffix = '';
+
         let tmpAdditionBoolean = {
-            x: false,
-            y: false,
-            take: false,
             check: false,
             checkmate: false
         }
-        // eslint-disable-next-line
-        let tmpAdditionString = {
-            x: String.fromCharCode(97 + piece.vector.x),
-            y: piece.vector.y.toString(),
-            take: 'x',
-            check: '+',
-            checkmate: '#'
+
+        let tmpBoardCloned = board.clone();
+
+        this.doWhateverThisMoveDo(tmpBoardCloned.getPieceAt(piece.vector), tmpBoardCloned);
+
+        if(tmpBoardCloned.isCheckmated(!piece.isWhite)) tmpAdditionBoolean.checkmate = true;
+        else if(tmpBoardCloned.getPiecesByTeamAndLetter(!piece.isWhite, 'K')[0].isAttacked(tmpBoardCloned)) tmpAdditionBoolean.check = true;
+
+        if(tmpAdditionBoolean.checkmate) suffix = suffix.concat('#');
+        else if(tmpAdditionBoolean.check) suffix = suffix.concat('+');
+
+        return suffix;
+    }
+
+    // Certified too long but idc :)
+    getAlgebraicNotationPrefix(piece, board) {
+        let prefix;
+        if(piece.letter === 'p') prefix = '';
+        else prefix = piece.letter;
+
+        let tmpAdditionBoolean = {
+            x: false,
+            y: false,
+            take: false
         }
 
         let tmpPieceVectorWithSameMove = [];
-
-        for(const p of tmpPiecesOfSameType) {
+        for(const p of board.getPiecesByTeamAndLetter(piece.isWhite, piece.letter).filter(p => !p.vector.equals(piece.vector))) {
             // eslint-disable-next-line
             for(const move of p.getValidMoves(this.getNewVector(piece.vector), board)) tmpPieceVectorWithSameMove.push(p.vector);
         }
@@ -112,23 +127,16 @@ class Move {
             else if(!tmpAdditionBoolean.x && !tmpAdditionBoolean.y) tmpAdditionBoolean.x = true;
         }
 
-        if(board.isPieceAt(this.getNewVector(piece.vector))) tmpAdditionBoolean.take = true;
+        if(board.isPieceAt(this.getNewDelVector(piece.vector))) tmpAdditionBoolean.take = true;
 
-        let tmpBoardCloned = board.clone();
+        if(tmpAdditionBoolean.x) prefix = prefix.concat(String.fromCharCode(97 + piece.vector.x));
+        if(tmpAdditionBoolean.y) prefix = prefix.concat((piece.vector.y+1).toString());
+        if(piece.letter === 'p' && tmpAdditionBoolean.take) prefix = prefix.concat(piece.letter, 'x');
+        else if(tmpAdditionBoolean.take) prefix = prefix.concat('x');
 
-        this.doWhateverThisMoveDo(tmpBoardCloned.getPieceAt(piece.vector), tmpBoardCloned);
 
-        if(tmpBoardCloned.isCheckmated(!piece.isWhite)) tmpAdditionBoolean.checkmate = true;
-        else if(tmpBoardCloned.getPiecesByTeamAndLetter(!piece.isWhite, 'K')[0].isAttacked(tmpBoardCloned)) tmpAdditionBoolean.check = true;
 
-        if(tmpAdditionBoolean.x) prefix = prefix.concat(tmpAdditionString.x);
-        if(tmpAdditionBoolean.y) prefix = prefix.concat(tmpAdditionString.y);
-        if(tmpAdditionBoolean.take) prefix = prefix.concat(tmpAdditionString.take);
-        if(tmpAdditionBoolean.check) suffix = suffix.concat(tmpAdditionString.check);
-        if(tmpAdditionBoolean.checkmate) suffix = suffix.concat(tmpAdditionString.checkmate);
-
-        return (prefix + AlgebraicNotation + suffix);
-
+        return prefix;
     }
 
 }

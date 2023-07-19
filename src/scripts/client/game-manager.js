@@ -75,6 +75,7 @@ class GameManager {
     // Event handler for when an enemy is found
     handleEnemyFound(isWhite) {
       this.isPlayerWhite = this.isPlayerTurn = isWhite;
+      this.board = new Board(this.board.size, this.board.imgs)
       return;
     }
   

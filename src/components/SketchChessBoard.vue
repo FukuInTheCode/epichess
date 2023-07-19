@@ -13,7 +13,7 @@
     
     data() {
       return {
-        clientStatus: "HelloWorld",
+        clientStatus: "HelloWorldy",
       }
     },
 
@@ -22,8 +22,10 @@
     },
 
     beforeUnmount() {
+      this.sketch.client.disconnectSocket()
       this.sketch.remove();
     },
+
     methods: {
 
       createSketch(sketch) {
