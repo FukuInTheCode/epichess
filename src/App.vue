@@ -1,25 +1,53 @@
 <template>
   <div id="app">
-    <SketchChessBoard />
+
+    <TheNavigation />
+
+    <router-view :client="this.client"></router-view>
   </div>
 </template>
 
 <script>
-import SketchChessBoard from "./components/SketchChessBoard.vue";
+
+import { MyClient } from './scripts/client/client.js';
+
+import TheNavigation from './components/TheNavigation.vue';
+
 
 export default {
   name: "App",
   components: {
-    SketchChessBoard,
+    TheNavigation
   },
+
+  data() {
+    return {
+      client: new MyClient()
+    }
+  }, 
+  beforeUnmount() {
+      this.client.disconnectSocket()
+    },
 };
+
+
 </script>
 
 <style>
-#app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+  /* Global Styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* App Container */
+  #app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0f0035; /* Light background color */
+  }
 </style>

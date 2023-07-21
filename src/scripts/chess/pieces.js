@@ -5,10 +5,10 @@ const { Move, KnightMove, BasePawnMove, FirstPawnMove, TackingPawnMove, EnPassan
 
 class Piece {
 
-    constructor(x, y, isWhite, letter, imgs) {
+    constructor(x, y, isWhite, letter) {
         this.vector = createVector(x, y);
         this.isWhite = isWhite;
-        this.img = imgs[0];
+        this.imgIndex = 0;
         this.letter = letter;
         this.moves = [
             new Move(createVector(1, 0)),
@@ -27,21 +27,31 @@ class Piece {
         this.enPassantVulnerable = false;
     }
 
-    show(tilesize, sketch) {
+    show(sketch, isReversed) {
         sketch.imageMode(sketch.CENTER);
+
+        let X, Y;
         if (this.isDragged) {
-            sketch.image(this.img, sketch.mouseX, sketch.mouseY, tilesize, tilesize);
+            X = sketch.mouseX;
+            Y = sketch.mouseY;
         } else {
-            sketch.image(this.img, 
-                this.vector.x * tilesize + tilesize / 2, 
-                this.vector.y * tilesize + tilesize / 2, 
-                tilesize, 
-                tilesize);
+            X = this.vector.x * sketch.tilesize + sketch.tilesize / 2;
+            Y = this.vector.y * sketch.tilesize + sketch.tilesize / 2;
+            if(isReversed) {
+                X = (8*sketch.tilesize) - X;
+                Y = (8*sketch.tilesize) - Y;
+
+            }
         }
+
+        sketch.image(sketch.imgs[this.imgIndex], X, Y, sketch.tilesize, sketch.tilesize);
     }
 
-    move(board, tilesize, X, Y) {
-        let mouseVector = createVector(Math.floor(X/tilesize), Math.floor(Y/tilesize));
+    move(board, tilesize, X, Y, isReversed) {
+        let mouseVector;
+        if (isReversed) mouseVector = createVector( 7 - Math.floor(X/tilesize), 7 - Math.floor(Y/tilesize));
+        else mouseVector = createVector(Math.floor(X/tilesize), Math.floor(Y/tilesize));
+
         const validMoves = this.getValidMoves(mouseVector, board);
         if (validMoves.length === 1) {
             if (board.getPiecesByTeamAndType(this.isWhite, King)[0].isPutInCheck(this, validMoves[0], board)) return false;
@@ -75,10 +85,10 @@ class Piece {
 }
 
 class King extends Piece {
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'K', imgs);
-        if (isWhite) this.img = imgs[0];
-        else this.img = imgs[6];
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'K');
+        if (isWhite) this.imgIndex = 0;
+        else this.imgIndex = 6;
         this.score = 1000;
 
         this.moves.push(new ShortCastle(createVector(2, 0)));
@@ -88,8 +98,8 @@ class King extends Piece {
     }
 
     
-    clone(imgs) {
-        return new King(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        return new King(this.vector.x, this.vector.y, this.isWhite);
     }
 
     isAttacked(board) {
@@ -116,10 +126,10 @@ class King extends Piece {
 }
 
 class Queen extends Piece{
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'Q', imgs);
-        if (isWhite) this.img = imgs[1];
-        else this.img = imgs[7]
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'Q');
+        if (isWhite) this.imgIndex = 1;
+        else this.imgIndex = 7;
         this.score = 9;
         this.moves = [];
         
@@ -135,17 +145,17 @@ class Queen extends Piece{
         }
     }
 
-    clone(imgs) {
-        return new Queen(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        return new Queen(this.vector.x, this.vector.y, this.isWhite);
     }
 
 }
 
 class Bishop extends Piece {
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'B', imgs);
-        if (isWhite) this.img = imgs[2];
-        else this.img = imgs[8]
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'B');
+        if (isWhite) this.imgIndex = 2;
+        else this.imgIndex = 8;
         this.score = 3;
         this.moves = [];
         for (let i = 1; i<8; i++) {
@@ -156,16 +166,16 @@ class Bishop extends Piece {
         }
     }
 
-    clone(imgs) {
-        return new Bishop(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        return new Bishop(this.vector.x, this.vector.y, this.isWhite);
     }
 }
 
 class Rook extends Piece {
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'R', imgs);
-        if (isWhite) this.img = imgs[4];
-        else this.img = imgs[10]
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'R');
+        if (isWhite) this.imgIndex = 4;
+        else this.imgIndex = 10;
         this.score = 9;
         this.moves = [];
         for (let i = 1; i<8; i++) {
@@ -176,16 +186,16 @@ class Rook extends Piece {
         }
     }
 
-    clone(imgs) {
-        return new Rook(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        return new Rook(this.vector.x, this.vector.y, this.isWhite);
     }
 }
 
 class Knight extends Piece {
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'N', imgs);
-        if (isWhite) this.img = imgs[3];
-        else this.img = imgs[9]
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'N');
+        if (isWhite) this.imgIndex = 3;
+        else this.imgIndex = 9;
         this.score = 3;
         this.moves = [];
         for (let i = -2; i<3; i+=4) {
@@ -196,16 +206,16 @@ class Knight extends Piece {
         }
     }
 
-    clone(imgs) {
-        return new Knight(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        return new Knight(this.vector.x, this.vector.y, this.isWhite);
     }
 
 }
 class Pawn extends Piece {
-    constructor(x, y, isWhite, imgs) {
-        super(x, y, isWhite, 'p', imgs);
-        if (isWhite) this.img = imgs[5];
-        else this.img = imgs[11]
+    constructor(x, y, isWhite) {
+        super(x, y, isWhite, 'p');
+        if (isWhite) this.imgIndex = 5;
+        else this.imgIndex = 11;
         this.score = 1;
 
         let i;
@@ -225,8 +235,8 @@ class Pawn extends Piece {
     }
         
 
-    clone(imgs) {
-        let ret = new Pawn(this.vector.x, this.vector.y, this.isWhite, imgs);
+    clone() {
+        let ret = new Pawn(this.vector.x, this.vector.y, this.isWhite);
 
         ret.firstMove = this.firstMove;
 

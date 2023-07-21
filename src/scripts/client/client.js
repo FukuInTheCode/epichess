@@ -10,18 +10,21 @@ import io from 'socket.io-client'
 
 class MyClient {
     constructor() {
+
         this.enemyID = null;
 
-        this.clientStatus = "Idling";
+        this.isPlaying = false;
+
+        this.isLogged = false;
+
+
+        this.gameManager = new GameManager();
+        this.uiHandler = new UIHandler();
 
         this.socket = io('http://192.168.1.34:3000', { transports: ['websocket'] });
-        
-    }
 
-    setup(imgs) {
-        this.gameManager = new GameManager(imgs);
-        this.uiHandler = new UIHandler(100);
         this.setListener();
+        
     }
 
     setListener() {
@@ -51,17 +54,11 @@ class MyClient {
 
         return;
     }
-
-
-        
-    mouseReleased() {
-        this.gameManager.handleMouseRelease(this);
-        return;
-    }
-
     
     clickPlayButton() {
         if (this.enemyID !== null) return;
+
+        this.isPlaying = true;
 
         this.uiHandler.updateHTMLPlayerStatus(this, 'In research...');
 
@@ -93,8 +90,11 @@ class MyClient {
     }
 
     enemyFound(enemyID, isPlayerWhite) {
+        
+        this.uiHandler.enemyUsername = enemyID;
         this.enemyID = enemyID;
         this.gameManager.handleEnemyFound(isPlayerWhite);
+        this.uiHandler.isReversed = isPlayerWhite;
         if (isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus(this, 'Game Found! Your Turn!');
         else this.uiHandler.updateHTMLPlayerStatus(this, 'Game Found! White turn!');
         return;
@@ -105,6 +105,11 @@ class MyClient {
             this.socket.disconnect();
         }
         return;
+    }
+
+    login(input) {
+        this.isLogged = true;
+        this.username = input.username;
     }
 }
 

@@ -2,44 +2,43 @@ import { King, Queen, Rook, Bishop, Knight, Pawn } from './pieces.js';
 
 
 class Board {
-    constructor(size, imgs){
+    constructor(size){
         this.whitePieces = [];
         this.blackPieces = [];
         this.size = size;
-        this.imgs = imgs;
 
         this.AlgebraicNotationArray = [];
-        this.setupPieces(imgs);
+        this.setupPieces();
 
 
     }
     
-    setupPieces(imgs) {
+    setupPieces() {
 
-        this.whitePieces.push(new King(4, 0, true, imgs));
-        this.blackPieces.push(new King(4, 7, false, imgs));
+        this.whitePieces.push(new King(3, 0, true));
+        this.blackPieces.push(new King(3, 7, false));
 
-        this.whitePieces.push(new Queen(3, 0, true, imgs));
-        this.blackPieces.push(new Queen(3, 7, false, imgs));
+        this.whitePieces.push(new Queen(4, 0, true));
+        this.blackPieces.push(new Queen(4, 7, false));
 
-        this.whitePieces.push(new Rook(0, 0, true, imgs));
-        this.blackPieces.push(new Rook(0, 7, false, imgs));
-        this.whitePieces.push(new Rook(7, 0, true, imgs));
-        this.blackPieces.push(new Rook(7, 7, false, imgs));
+        this.whitePieces.push(new Rook(0, 0, true));
+        this.blackPieces.push(new Rook(0, 7, false));
+        this.whitePieces.push(new Rook(7, 0, true));
+        this.blackPieces.push(new Rook(7, 7, false));
         
-        this.whitePieces.push(new Bishop(2, 0, true, imgs));
-        this.blackPieces.push(new Bishop(2, 7, false, imgs));
-        this.whitePieces.push(new Bishop(5, 0, true, imgs));
-        this.blackPieces.push(new Bishop(5, 7, false, imgs));
+        this.whitePieces.push(new Bishop(2, 0, true));
+        this.blackPieces.push(new Bishop(2, 7, false));
+        this.whitePieces.push(new Bishop(5, 0, true));
+        this.blackPieces.push(new Bishop(5, 7, false));
 
-        this.whitePieces.push(new Knight(1, 0, true, imgs));
-        this.blackPieces.push(new Knight(1, 7, false, imgs));
-        this.whitePieces.push(new Knight(6, 0, true, imgs));
-        this.blackPieces.push(new Knight(6, 7, false, imgs));
+        this.whitePieces.push(new Knight(1, 0, true));
+        this.blackPieces.push(new Knight(1, 7, false));
+        this.whitePieces.push(new Knight(6, 0, true));
+        this.blackPieces.push(new Knight(6, 7, false));
 
         for (let i = 0; i<8; i++) {
-            this.whitePieces.push(new Pawn(i, 1, true, imgs));
-            this.blackPieces.push(new Pawn(i, 6, false, imgs));
+            this.whitePieces.push(new Pawn(i, 1, true));
+            this.blackPieces.push(new Pawn(i, 6, false));
         }
 
         
@@ -47,25 +46,25 @@ class Board {
         
     }
 
-    show(tilesize, sketch){
+    show(sketch, isReversed){
 
         let i, j;
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 8; j++) {
-              if ((i + j) % 2 == 0) {
+              if ((i + j) % 2 == 1) {
                 sketch.fill(78, 135, 13);
               } else {
                 sketch.fill(241, 255, 223);
               }
               sketch.noStroke();
-              sketch.rect(i * tilesize, j * tilesize, tilesize);
+              sketch.rect(i * sketch.tilesize, j * sketch.tilesize, sketch.tilesize);
         
             }
           }
         
 
-        for(i = 0; i < this.whitePieces.length; i++) this.whitePieces[i].show(tilesize, sketch);
-        for(i = 0; i < this.blackPieces.length; i++) this.blackPieces[i].show(tilesize, sketch);
+        for(i = 0; i < this.whitePieces.length; i++) this.whitePieces[i].show(sketch, isReversed);
+        for(i = 0; i < this.blackPieces.length; i++) this.blackPieces[i].show(sketch, isReversed);
         return;
     }
 
@@ -105,12 +104,12 @@ class Board {
 
     clone() {
         let i;
-        let ret = new Board(this.size, this.imgs);
+        let ret = new Board(this.size);
         ret.AlgebraicNotationArray = this.AlgebraicNotationArray;
         ret.whitePieces = [];
         ret.blackPieces = [];
-        for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone(this.imgs));
-        for(i = 0; i<this.blackPieces.length; i++) ret.blackPieces.push(this.blackPieces[i].clone(this.imgs));
+        for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone());
+        for(i = 0; i<this.blackPieces.length; i++) ret.blackPieces.push(this.blackPieces[i].clone());
         return ret;
     }
 

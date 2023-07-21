@@ -3,12 +3,15 @@ import { Board } from '../chess/board.js'
 import { createVector } from '../chess/vector.js'
 
 class GameManager {
-    constructor(imgs) {
-        this.board = new Board(8, imgs);
-        this.isPlayerTurn = true;
+    constructor() {
+        this.board = new Board(8);
+        this.isPlayerTurn = false;
         this.isPlayerWhite = true;
         this.dragged = null
-
+        this.timer = {
+            minutes: '00',
+            secondes: '00'
+        }
     }
   
     // Update the board with the received data
@@ -34,7 +37,13 @@ class GameManager {
     }
 
     handleMousePressed(client, sketch) {
-        let tmpMouseVector = createVector(Math.floor(sketch.mouseX/client.uiHandler.tilesize), Math.floor(sketch.mouseY/client.uiHandler.tilesize));
+        let tmpMouseVector;
+        if (client.uiHandler.isReversed) {
+            tmpMouseVector = createVector(7 - Math.floor(sketch.mouseX/sketch.tilesize), 7 - Math.floor(sketch.mouseY/sketch.tilesize));
+        } else {
+            tmpMouseVector = createVector(Math.floor(sketch.mouseX/sketch.tilesize), Math.floor(sketch.mouseY/sketch.tilesize));
+        }
+        
         if (this.board.isPieceAt(tmpMouseVector)) {
             this.dragged = this.board.getPieceAt(tmpMouseVector);
             this.dragged.isDragged = true;
@@ -54,7 +63,7 @@ class GameManager {
         this.dragged.isDragged = false;
 
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
-            if (this.dragged.move(this.board, client.uiHandler.tilesize, sketch.mouseX, sketch.mouseY)) {
+            if (this.dragged.move(this.board, sketch.tilesize, sketch.mouseX, sketch.mouseY, client.uiHandler.isReversed)) {
                 client.uiHandler.show(client, sketch);
                 console.log(this.board.AlgebraicNotationArray);
                 client.sendData();

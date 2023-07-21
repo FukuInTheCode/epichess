@@ -73,7 +73,8 @@ class Move {
     }
 
     getAlgebraicNotation(piece, board) {
-        let AlgebraicNotation = String.fromCharCode(97 + this.getNewVector(piece.vector).x) + (this.getNewVector(piece.vector).y + 1).toString();
+        console.log(String.fromCharCode(104))
+        let AlgebraicNotation = String.fromCharCode(104 - this.getNewVector(piece.vector).x) + (this.getNewVector(piece.vector).y + 1).toString();
 
         let prefix = this.getAlgebraicNotationPrefix(piece, board);
         let suffix = this.getAlgebraicNotationSuffix(piece, board);
@@ -129,7 +130,7 @@ class Move {
 
         if(board.isPieceAt(this.getNewDelVector(piece.vector))) tmpAdditionBoolean.take = true;
 
-        if(tmpAdditionBoolean.x) prefix = prefix.concat(String.fromCharCode(97 + piece.vector.x));
+        if(tmpAdditionBoolean.x) prefix = prefix.concat(String.fromCharCode(104 - piece.vector.x));
         if(tmpAdditionBoolean.y) prefix = prefix.concat((piece.vector.y+1).toString());
         if(piece.letter === 'p' && tmpAdditionBoolean.take) prefix = prefix.concat(piece.letter, 'x');
         else if(tmpAdditionBoolean.take) prefix = prefix.concat('x');

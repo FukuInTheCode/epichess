@@ -1,0 +1,21 @@
+<template>
+    <TheLoginForm :client="this.client"/>
+
+</template>
+
+<script>
+
+import TheLoginForm from '@/components/TheLoginForm.vue';
+
+
+export default {
+    props: {
+        client: {type: Object, required: true}
+    },
+
+    components: {
+    TheLoginForm,
+}
+}
+
+</script>

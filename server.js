@@ -22,6 +22,8 @@ io.on('connection', (socket) => {
 
     if (!socket.enemyID) return;
 
+    console.log(socket.enemyID)
+
     let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
 
     tmpEnemy.enemyID = null;
