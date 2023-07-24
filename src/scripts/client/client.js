@@ -5,7 +5,7 @@ import { GameManager } from './game-manager.js';
 import { UIHandler } from './UIHandler.js';
 import io from 'socket.io-client'
 
-// Represents the client class for the chess application
+// Represents the client class for the chess applications
 
 
 class MyClient {

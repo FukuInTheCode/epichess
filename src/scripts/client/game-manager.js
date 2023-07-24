@@ -65,7 +65,6 @@ class GameManager {
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
             if (this.dragged.move(this.board, sketch.tilesize, sketch.mouseX, sketch.mouseY, client.uiHandler.isReversed)) {
                 client.uiHandler.show(client, sketch);
-                console.log(this.board.AlgebraicNotationArray);
                 client.sendData();
  
             }
