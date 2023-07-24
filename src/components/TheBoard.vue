@@ -1,8 +1,5 @@
 <template>
 
-  <a v-if="client.pd"> Hello</a>
-  <a v-else> Hello2</a>
-
   <div class="container">
 
     <div class="users-board-container">
@@ -42,7 +39,7 @@
     <div class="button-or-Notation">
       <button  v-if="!(client.isPlaying)" class="PlayButton" ref="playButton" @click="this.client.clickPlayButton()">Play</button>
       <ul class="AlgebraicNotationMoves">
-        <li v-for="(move, index) in AlgebraicNotationArray" :key="index" class="move-item" >
+        <li v-for="(move, index) in this.getAlgebraic" :key="index" class="move-item" >
           {{ (index + 1) + '. ' + move }}
         </li>
       </ul>
@@ -140,12 +137,12 @@ color:antiquewhite;
     props: {
       client: {type: MyClient, required: true},
     },
-
-
-    data() {
-      return {
-        AlgebraicNotationArray: []
+    
+    computed: {
+      getAlgebraic() {
+        return this.client.gameManager.board.AlgebraicNotationArray;
       }
+
     },
 
     mounted() {
@@ -154,11 +151,6 @@ color:antiquewhite;
 
     beforeUnmount() {
       this.sketch.remove();
-    },
-    watch: {
-      'client.AlgebraicNotationArray'(newValue) {
-        console.log(newValue)
-      },
     },
 
     methods: {
