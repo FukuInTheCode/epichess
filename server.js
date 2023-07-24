@@ -22,8 +22,6 @@ io.on('connection', (socket) => {
 
     if (!socket.enemyID) return;
 
-    console.log(socket.enemyID)
-
     let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
 
     tmpEnemy.enemyID = null;
@@ -33,6 +31,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('inResearch', () => {
+    if(ClientIDGameQueue.includes(socket.id)) return;
     // check if a clients is already searching for a game and if not add the clients to the Queue
     if (ClientIDGameQueue.length > 0) {
 
@@ -64,6 +63,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('lostByCheckmate', () => {
+    console.log(socket.enemyID);
     let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
     tmpEnemy.emit('wonByCheckmate');
     socket.enemyID = null;

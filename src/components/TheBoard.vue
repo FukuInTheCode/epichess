@@ -8,7 +8,7 @@
   
         <div class="user-info">
           <img class="user-profile-picture" src="../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_01.png">
-          <p class="username"> {{ this.client.uiHandler.username }}</p>
+          <p class="username"> {{ client.username }}</p>
           
         </div>
   
@@ -23,7 +23,7 @@
       <div class="user">
         <div class="user-info">
           <img class="user-profile-picture" src="../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_01.png">
-          <p class="username"> {{ client.uiHandler.enemyUsername }}</p>
+          <p class="username"> {{ 'prout' }}</p>
         </div>
 
         <div class="timer">
@@ -31,15 +31,13 @@
         </div>
 
       </div>
-
-      
   
     </div>
 
     <div class="button-or-Notation">
-      <button  v-if="!(client.isPlaying)" class="PlayButton" ref="playButton" @click="this.client.clickPlayButton()">Play</button>
+      <button  v-if="!(isPlaying[0])" class="PlayButton" ref="playButton" @click="clickPlayButton()">Play</button>
       <ul class="AlgebraicNotationMoves">
-        <li v-for="(move, index) in this.getAlgebraic" :key="index" class="move-item" >
+        <li v-for="(move, index) in AlgebraicNotationArray" :key="index" class="move-item">
           {{ (index + 1) + '. ' + move }}
         </li>
       </ul>
@@ -49,6 +47,116 @@
   </div>
 
 </template>
+
+  
+  <script>
+  import { GameManager } from "@/scripts/client/game-manager";
+
+  import { UIHandler } from "@/scripts/client/UIHandler";
+
+  import p5 from "p5";
+
+  const uiHandler = new UIHandler();
+
+  const gameManager = new GameManager(uiHandler);
+
+
+
+  export default {
+
+    data() {
+      return {
+        AlgebraicNotationArray: [],
+        isPlaying: [false],
+      }
+    },
+    
+    props: {
+      client: { type: Object, required: true, default: () => ({})},
+      // socket, username
+    },
+
+    mounted() {
+      gameManager.initSocket(this.client.socket, this.isPlaying);
+
+      this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {
+            this.AlgebraicNotationArray.push(AlgebraicNotation);
+            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.isPlaying);
+            return;
+        });
+
+      this.sketch = new p5(this.createSketch, this.$refs.sketchContainer);
+    },
+
+    beforeUnmount() {
+      this.sketch.remove();
+    },
+
+    methods: {
+
+      clickPlayButton() {
+        this.AlgebraicNotationArray = [];
+        gameManager.clickPlayButton(this.client.socket);
+      },
+
+      createSketch(sketch) {
+
+        sketch.preload = () => {
+          sketch.imgs = [];
+
+          let i;
+          for(i = 1; i<=9;i++) {
+            sketch.imgs.push(sketch.loadImage('../../../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_0'+ i +'.png'))
+          }
+          for(i = 10; i<=12;i++) {
+            sketch.imgs.push(sketch.loadImage('../../../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_'+ i +'.png'))
+          }
+        }
+
+
+        sketch.setup = () => {
+
+          let tmpSize = Math.min(720, sketch.windowHeight, sketch.windowWidth);
+
+          tmpSize = tmpSize - tmpSize%8;
+
+          sketch.tilesize = tmpSize/8;
+
+          sketch.createCanvas(tmpSize, tmpSize);
+        };
+
+        sketch.windowResized = () => {
+
+          let tmpSize = Math.min(720, sketch.windowHeight, sketch.windowWidth);
+
+          tmpSize = tmpSize - tmpSize%8;
+
+          sketch.tilesize = tmpSize/8;
+
+          sketch.resizeCanvas(tmpSize, tmpSize);
+
+        };
+  
+        sketch.draw = () => {
+          sketch.background(144);
+          uiHandler.show(gameManager, sketch);
+        };
+
+        sketch.mousePressed = () => {
+          gameManager.handleMousePressed(sketch);
+        }
+
+        sketch.mouseReleased = () => {
+          gameManager.handleMouseReleased(sketch, this.client.socket, this.AlgebraicNotationArray);
+        }  
+
+      },
+    }
+  };
+  </script>
+
+
+
 
 <style scoped>
 
@@ -124,91 +232,7 @@ box-sizing: border-box;
 padding: 5px;
 text-align: center;
 color:antiquewhite;
+list-style-type : none;
+
 }
 </style>
-
-  
-  <script>
-  import p5 from "p5";
-  import { MyClient } from "@/scripts/client/client";
-
-  export default {
-    
-    props: {
-      client: {type: MyClient, required: true},
-    },
-    
-    computed: {
-      getAlgebraic() {
-        return this.client.gameManager.board.AlgebraicNotationArray;
-      }
-
-    },
-
-    mounted() {
-      this.sketch = new p5(this.createSketch, this.$refs.sketchContainer);
-    },
-
-    beforeUnmount() {
-      this.sketch.remove();
-    },
-
-    methods: {
-
-
-      createSketch(sketch) {
-
-        sketch.preload = () => {
-          sketch.imgs = [];
-
-          let i;
-          for(i = 1; i<=9;i++) {
-            sketch.imgs.push(sketch.loadImage('../../../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_0'+ i +'.png'))
-          }
-          for(i = 10; i<=12;i++) {
-            sketch.imgs.push(sketch.loadImage('../../../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_'+ i +'.png'))
-          }
-        }
-
-
-        sketch.setup = () => {
-
-          let tmpSize = Math.min(720, sketch.windowHeight, sketch.windowWidth);
-
-          tmpSize = tmpSize - tmpSize%8;
-
-          sketch.tilesize = tmpSize/8;
-
-          sketch.createCanvas(tmpSize, tmpSize);
-        };
-
-        sketch.windowResized = () => {
-
-          let tmpSize = Math.min(720, sketch.windowHeight, sketch.windowWidth);
-
-          tmpSize = tmpSize - tmpSize%8;
-
-          sketch.tilesize = tmpSize/8;
-
-          sketch.resizeCanvas(tmpSize, tmpSize);
-
-        };
-  
-        sketch.draw = () => {
-          sketch.background(144);
-          this.client.uiHandler.show(this.client, sketch);
-
-        };
-
-        sketch.mousePressed = () => {
-          this.client.gameManager.handleMousePressed(this.client, sketch);
-        }
-
-        sketch.mouseReleased = () => {
-          this.client.gameManager.handleMouseReleased(this.client, sketch);
-        }  
-
-      },
-    }
-  };
-  </script>

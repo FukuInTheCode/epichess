@@ -10,12 +10,12 @@ class UIHandler {
     }
 
         
-    show(client, sketch) {
-        client.gameManager.board.show(sketch, this.isReversed);
+    show(gameManager, sketch) {
+        gameManager.board.show(sketch, this.isReversed);
         return;
     }
 
-    updateHTMLPlayerStatus(client, status) {
+    updateHTMLPlayerStatus(status) {
         this.clientStatus = status;
         return;
     }

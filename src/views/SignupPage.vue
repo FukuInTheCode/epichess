@@ -10,7 +10,7 @@ import TheSignupForm from '@/components/TheSignupForm.vue';
 export default {
 
     props: {
-        client: {type: Object, required: true}
+        client: { type: Object, required: true, default: () => ({}) }
     },
 
     components: {

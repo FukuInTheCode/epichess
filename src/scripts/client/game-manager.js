@@ -3,42 +3,68 @@ import { Board } from '../chess/board.js'
 import { createVector } from '../chess/vector.js'
 
 class GameManager {
-    constructor() {
+    constructor(uiHandler) {
         this.board = new Board(8);
         this.isPlayerTurn = false;
         this.isPlayerWhite = true;
-        this.dragged = null
-        this.timer = {
-            minutes: '00',
-            secondes: '00'
-        }
+        this.isPlaying = false;
+        this.dragged = null;
+        this.uiHandler = uiHandler;
+    }
+    // eslint-disable-next-line
+    initSocket(socket, isPlaying) {
+        socket.on('enemyFound', (enemyID, isPlayerWhite) => {
+            isPlaying[0] = true;
+            this.handleEnemyFound(enemyID, isPlayerWhite);
+            return;
+        });
+
+        socket.on('enemyDisconnected', () => {
+            isPlaying[0] = false;
+            this.handleEnemyDisconnected();
+            return;
+        });
+
+        socket.on('wonByCheckmate', () => {
+            isPlaying[0] = false;
+            this.handleWonByCheckmate();
+            return;
+        });
+
+        socket.on('patNotEnoughtMaterial', () => {
+            isPlaying[0] = false;
+            this.handlePatByNotEnoughtMaterial()
+        })
+
+        return;
     }
   
     // Update the board with the received data
-    updateBoard(listedBoard, AlgebraicNotation, client) {
+    updateBoard(listedBoard, AlgebraicNotation, socket, isPlaying) {
         this.isPlayerTurn = true;
-        client.uiHandler.updateHTMLPlayerStatus(client, 'Your turn!');
+        this.uiHandler.updateHTMLPlayerStatus('Your turn!');
         this.board.listToBoard(listedBoard);
         this.board.AlgebraicNotationArray.push(AlgebraicNotation);
-        console.log(this.board.AlgebraicNotationArray);
 
         
         if (this.amICheckmated()) {
-            client.socket.emit('lostByCheckmate');
-            this.handleLostByCheckmate(client);
+            isPlaying[0] = false;
+            socket.emit('lostByCheckmate');
+            this.handleLostByCheckmate();
         }
 
         if (this.isPatByMaterial()) {
-            client.socket.emit('GameEndOnPat-NEM')
-            this.handlePatByNotEnoughtMaterial(client);
+            isPlaying[0] = false;
+            socket.emit('GameEndOnPat-NEM');
+            this.handlePatByNotEnoughtMaterial();
         }
 
         return;
     }
 
-    handleMousePressed(client, sketch) {
+    handleMousePressed(sketch) {
         let tmpMouseVector;
-        if (client.uiHandler.isReversed) {
+        if (this.uiHandler.isReversed) {
             tmpMouseVector = createVector(7 - Math.floor(sketch.mouseX/sketch.tilesize), 7 - Math.floor(sketch.mouseY/sketch.tilesize));
         } else {
             tmpMouseVector = createVector(Math.floor(sketch.mouseX/sketch.tilesize), Math.floor(sketch.mouseY/sketch.tilesize));
@@ -51,22 +77,23 @@ class GameManager {
     } 
 
 
-    handleMouseReleased(client, sketch) {
+    handleMouseReleased(sketch, socket, arr) {
 
         if (!this.dragged) return;
-
-        if (client.enemyID === null) {
-            this.dragged.isDragged = false;
-            return;
-        }
 
         this.dragged.isDragged = false;
 
         if (this.isPlayerTurn && this.dragged.isWhite === this.isPlayerWhite) {
-            if (this.dragged.move(this.board, sketch.tilesize, sketch.mouseX, sketch.mouseY, client.uiHandler.isReversed)) {
-                client.uiHandler.show(client, sketch);
-                client.sendData();
- 
+            if (this.dragged.move(this.board, sketch.tilesize, sketch.mouseX, sketch.mouseY, this.uiHandler.isReversed)) {
+                this.uiHandler.show(this, sketch);
+
+                arr.push(this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length-1]);
+                
+                this.sendData(socket);
+
+                if (this.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
+                else this.uiHandler.updateHTMLPlayerStatus('White turn!');
+
             }
         }
         this.dragged = null;
@@ -75,37 +102,44 @@ class GameManager {
   
     // Event handler for when the enemy disconnects
     handleEnemyDisconnected() {
+        this.uiHandler.updateHTMLPlayerStatus('Won! Enemy disconnect!');
+        this.isPlaying = false;
         this.isPlayerTurn = false;
       return;
     }
   
     // Event handler for when an enemy is found
-    handleEnemyFound(isWhite) {
-      this.isPlayerWhite = this.isPlayerTurn = isWhite;
-      this.board = new Board(this.board.size, this.board.imgs)
-      return;
+    handleEnemyFound(enemyID, isPlayerWhite) {
+        this.isPlaying = true;
+        this.uiHandler.enemyUsername = enemyID
+        this.uiHandler.isReversed = isPlayerWhite;
+        this.isPlayerWhite = this.isPlayerTurn = isPlayerWhite;
+        this.board = new Board(this.board.size, this.board.imgs);
+        if (isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Game Found! Your Turn!');
+        else this.uiHandler.updateHTMLPlayerStatus('Game Found! White turn!');
+        return;
     }
   
     // Event handler for when the player is checkmated
-    handleLostByCheckmate(client) {
-        client.uiHandler.updateHTMLPlayerStatus(client, 'lost! Checkmated!');
-        client.enemyID = null;
+    handleLostByCheckmate() {
+        this.uiHandler.updateHTMLPlayerStatus('lost! Checkmated!');
         this.isPlayerTurn = false;
+        this.isPlaying = false;
         return;
     }
   
     // Event handler for when the enemy is checkmated
-    handleWonByCheckmate(client) {
-        client.uiHandler.updateHTMLPlayerStatus(client, 'Won! Enemy is checkmated!');
-        client.enemyID = null;
+    handleWonByCheckmate() {
+        this.uiHandler.updateHTMLPlayerStatus('Won! Enemy is checkmated!');
         this.isPlayerTurn = false;
+        this.isPlaying = false;
         return;
     }
 
-    handlePatByNotEnoughtMaterial(client) {
-        client.uiHandler.updateHTMLPlayerStatus(client, 'Pat! Not enought material! Nobody Win!');
-        client.enemyID = null;
+    handlePatByNotEnoughtMaterial() {
+        this.uiHandler.updateHTMLPlayerStatus('Pat! Not enought material! Nobody Win!');
         this.isPlayerTurn = false;
+        this.isPlaying = false;
         return;
     }
 
@@ -115,12 +149,31 @@ class GameManager {
 
 
     isPatByMaterial() {
-
         return !(
             this.board.hasEnoughtPieces(true) ||
             this.board.hasEnoughtPieces(false)
         )
     }
+
+    sendData(socket) {
+        const listedBoard = this.board.boardToList();
+        this.isPlayerTurn = false;
+        socket.emit('hasPlayed', listedBoard, this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length - 1]);
+        return;
+    }
+
+
+    // eslint-disable-next-line
+    clickPlayButton(socket) {
+
+        this.uiHandler.updateHTMLPlayerStatus('In research...');
+
+        socket.emit('inResearch');
+
+
+
+    }
+
   }
 
 export { GameManager };

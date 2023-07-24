@@ -1,5 +1,5 @@
 <template>
-    <TheBoard :client="this.client"></TheBoard>
+    <TheBoard :client="client"></TheBoard>
 
 </template>
 
@@ -12,7 +12,7 @@ export default {
     },
 
     props: {
-        client: { type: Object, required: true }
+        client: { type: Object, required: true, default: () => ({}) }
     },
 }
 </script>

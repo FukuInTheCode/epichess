@@ -10,7 +10,7 @@ import TheLoginForm from '@/components/TheLoginForm.vue';
 
 export default {
     props: {
-        client: {type: Object, required: true}
+        client: { type: Object, required: true, default: () => ({}) }
     },
 
     components: {

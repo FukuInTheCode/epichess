@@ -3,15 +3,15 @@
 
     <TheNavigation />
 
-    <router-view :client="this.client"></router-view>
+    <router-view :client="client"></router-view>
   </div>
 </template>
 
 <script>
 
-import { MyClient } from './scripts/client/client.js';
-
 import TheNavigation from './components/TheNavigation.vue';
+
+import io from 'socket.io-client'
 
 
 export default {
@@ -22,11 +22,14 @@ export default {
 
   data() {
     return {
-      client: new MyClient()
+      client: {
+        username: 'Anonymous156',
+        socket: io('http://192.168.1.34:3000', { transports: ['websocket'] }),
+      }
     }
   }, 
   beforeUnmount() {
-      this.client.disconnectSocket()
+      this.client.socket.disconnect()
     },
 };
 

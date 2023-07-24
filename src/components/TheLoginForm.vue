@@ -25,7 +25,7 @@
         },
 
         props: {
-            client: {type: Object, required: true},
+          client: { type: Object, required: true, default: () => ({}) }
         }
     }
 </script>
