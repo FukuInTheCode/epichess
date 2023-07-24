@@ -18,7 +18,7 @@
   
       </div>
       
-      <div ref="sketchContainer" class="sketchContainer"></div>
+      <div ref="sketchContainer" class="sketchContainer" oncontextmenu="return false"></div>
 
       <div class="user">
         <div class="user-info">
@@ -35,9 +35,9 @@
     </div>
 
     <div class="button-or-Notation">
-      <button  v-if="!(isPlaying[0])" class="PlayButton" ref="playButton" @click="clickPlayButton()">Play</button>
+      <button  v-if="!(client.isPlaying[0])" class="PlayButton" ref="playButton" @click="clickPlayButton()">Play</button>
       <ul class="AlgebraicNotationMoves">
-        <li v-for="(move, index) in AlgebraicNotationArray" :key="index" class="move-item">
+        <li v-for="(move, index) in client.AlgebraicNotationArray" :key="index" class="move-item">
           {{ (index + 1) + '. ' + move }}
         </li>
       </ul>
@@ -63,13 +63,6 @@
 
 
   export default {
-
-    data() {
-      return {
-        AlgebraicNotationArray: [],
-        isPlaying: [false],
-      }
-    },
     
     props: {
       client: { type: Object, required: true, default: () => ({})},
@@ -77,11 +70,12 @@
     },
 
     mounted() {
-      gameManager.initSocket(this.client.socket, this.isPlaying);
+      gameManager.initSocket(this.client.socket, this.client.isPlaying);
 
       this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {
-            this.AlgebraicNotationArray.push(AlgebraicNotation);
-            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.isPlaying);
+            // eslint-disable-next-line
+            this.client.AlgebraicNotationArray.push(AlgebraicNotation);
+            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying);
             return;
         });
 
@@ -95,7 +89,8 @@
     methods: {
 
       clickPlayButton() {
-        this.AlgebraicNotationArray = [];
+        // eslint-disable-next-line
+        this.client.AlgebraicNotationArray = [];
         gameManager.clickPlayButton(this.client.socket);
       },
 
@@ -147,7 +142,7 @@
         }
 
         sketch.mouseReleased = () => {
-          gameManager.handleMouseReleased(sketch, this.client.socket, this.AlgebraicNotationArray);
+          gameManager.handleMouseReleased(sketch, this.client.socket, this.client.AlgebraicNotationArray);
         }  
 
       },

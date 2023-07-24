@@ -25,6 +25,8 @@ export default {
       client: {
         username: 'Anonymous156',
         socket: io('http://192.168.1.34:3000', { transports: ['websocket'] }),
+        AlbegraicNotationArray: [],
+        isPlaying: [false]
       }
     }
   }, 
