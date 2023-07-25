@@ -16,6 +16,7 @@ io.on('connection', (socket) => {
 
   socket.enemyID = null;
   socket.isConnected = false;
+  socket.username = null;
 
   clients.push(socket);
 
@@ -145,7 +146,28 @@ io.on('connection', (socket) => {
       if(err) throw err;
       if(result.length === 0) return;
       socket.emit('userElo', result[0].user_elo);
-    })
+    });
+  });
+
+  socket.on('userExists', (username)=> {
+    con.query(`SELECT id FROM user_info WHERE username='${username}'`, (err, result)=>{
+      if(err) {
+        socket.emit('ResponceToUserExists', false);
+        throw err;
+      };
+
+      if(result.length !== 1) {
+        socket.emit('ResponceToUserExists', false);
+        return;
+      }
+
+      socket.emit('ResponceToUserExists', true);
+    });
+  });
+
+  socket.on('disconnectUser', ()=>{
+    socket.isConnected = false;
+    socket.username = null;
   })
 
 });

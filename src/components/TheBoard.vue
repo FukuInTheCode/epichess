@@ -78,6 +78,8 @@
     },
 
     mounted() {
+
+      console.log(this.$route)
       gameManager.initSocket(this.client.socket, this.client.isPlaying);
 
       this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {

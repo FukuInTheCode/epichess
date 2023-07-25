@@ -31,7 +31,12 @@ export default {
         elo: 0
       }
     }
-  }, 
+  },
+
+  mounted() {
+    this.$route.socket = this.client.socket;
+  },
+
   beforeUnmount() {
       this.client.socket.disconnect()
     },

@@ -15,7 +15,12 @@ export default {
 
     components: {
     TheSignupForm,
-}
+    },
+
+    mounted() {
+        this.$route.socket = this.client.socket;
+    },
+
 }
 
 </script>

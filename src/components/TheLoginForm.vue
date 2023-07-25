@@ -53,6 +53,8 @@
               })
 
               this.client.socket.emit('getElo', this.client.username);
+
+              this.$router.push('/');
             })
 
             this.client.socket.emit('userLogin', input.username, input.password);

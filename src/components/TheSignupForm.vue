@@ -46,6 +46,17 @@
               this.client.username = input.username;
               // eslint-disable-next-line
               this.client.isConnected = true;
+
+              
+              this.client.socket.once('userElo', (elo) => {
+                // eslint-disable-next-line
+                this.client.elo = elo;
+              })
+
+              this.client.socket.emit('getElo', this.client.username);
+
+              this.$router.push('/');
+
             })
 
             this.client.socket.emit('userSignup', input.username, input.password);

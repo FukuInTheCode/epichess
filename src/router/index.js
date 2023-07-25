@@ -7,7 +7,8 @@ const router = createRouter(
         routes: [
             {path: '/', name: 'Home', component: () => import('../views/HomePage.vue'), props: true},
             {path: '/login', name: 'Login', component: () => import('../views/LoginPage.vue'), props: true},
-            {path: '/signup', name: 'Signup', component: () => import('../views/SignupPage.vue'), props: true}
+            {path: '/signup', name: 'Signup', component: () => import('../views/SignupPage.vue'), props: true},
+            {path: '/user/:username', component: () => import('../views/userProfilePage.vue')}
         ]
     }
 )

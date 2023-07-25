@@ -14,5 +14,10 @@ export default {
     props: {
         client: { type: Object, required: true, default: () => ({}) }
     },
+
+    mounted() {
+        this.$route.socket = this.client.socket;
+    },
+
 }
 </script>
