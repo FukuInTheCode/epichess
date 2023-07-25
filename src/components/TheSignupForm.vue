@@ -2,9 +2,10 @@
     <div id="signup">
         <form >
             <h1>Sign Up</h1>
+            <p v-if="isError"> {{ errorStr }} </p>
             <input type="text" name="username" v-model="input.username" placeholder="Username" autocomplete="username"/>
             <input type="password" name="password" v-model="input.password" placeholder="Password" autocomplete="current-password" />
-            <button type="button" v-on:click="signup()">Sign Up</button>
+            <button type="button" v-on:click="signup(input)">Sign Up</button>
 
         </form>
 
@@ -16,7 +17,11 @@
     export default {
         name: 'SignupForm',
         data() {
-            return {
+          return {
+                isError: false,
+
+                errorStr: '',
+
                 input: {
                     username: "",
                     password: ""
@@ -29,9 +34,22 @@
         },
         
         methods: {
-            signup() {
-                console.log(this.input)
-            }
+          signup(input){
+
+            this.client.socket.once('signupFeedback', (err) => {
+              if(err) {
+                this.errorStr = err;
+                this.isError = true;
+                return;
+              }
+              // eslint-disable-next-line
+              this.client.username = input.username;
+              // eslint-disable-next-line
+              this.client.isConnected = true;
+            })
+
+            this.client.socket.emit('userSignup', input.username, input.password);
+          } 
         }
     }
 </script>

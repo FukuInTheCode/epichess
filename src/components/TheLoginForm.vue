@@ -2,9 +2,10 @@
     <div id="login">
         <form >
             <h1>Login</h1>
+            <p v-if="isError"> {{ errorStr }} </p>
             <input type="text" name="username" v-model="input.username" placeholder="Username" autocomplete="username"/>
             <input type="password" name="password" v-model="input.password" placeholder="Password" autocomplete="current-password" />
-            <button type="button" v-on:click="this.client.login(input)">Login</button>
+            <button type="button" v-on:click="login(input)">Login</button>
 
         </form>
 
@@ -17,6 +18,10 @@
         name: 'LoginForm',
         data() {
             return {
+                isError: false,
+
+                errorStr: '',
+
                 input: {
                     username: "",
                     password: ""
@@ -26,6 +31,32 @@
 
         props: {
           client: { type: Object, required: true, default: () => ({}) }
+        },
+        
+        methods: {
+          login(input){
+
+            this.client.socket.once('loginFeedback', (err) => {
+              if(err) {
+                this.errorStr = err;
+                this.isError = true;
+                return;
+              }
+              // eslint-disable-next-line
+              this.client.username = input.username;
+              // eslint-disable-next-line
+              this.client.isConnected = true;
+
+              this.client.socket.once('userElo', (elo) => {
+                // eslint-disable-next-line
+                this.client.elo = elo;
+              })
+
+              this.client.socket.emit('getElo', this.client.username);
+            })
+
+            this.client.socket.emit('userLogin', input.username, input.password);
+          } 
         }
     }
 </script>
@@ -51,7 +82,7 @@
 
   #login input[type="text"], #login input[type="password"],
   #signup input[type="text"], #signup input[type="password"] {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;

@@ -1,4 +1,5 @@
 const express = require('express');
+const { con } = require('./mysql');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -7,12 +8,17 @@ let clients = [];
 
 let ClientIDGameQueue = [];
 
+
 // Socket.IO event handling
 io.on('connection', (socket) => {
 
   console.log(clients.length + ': User | ' + socket.id, 'connected');
-  clients.push(socket);
+
   socket.enemyID = null;
+  socket.isConnected = false;
+
+  clients.push(socket);
+
 
   socket.on('disconnect', () => {
     console.log('User | ' + socket.id, 'disconnected');
@@ -78,11 +84,80 @@ io.on('connection', (socket) => {
 
   });
 
+  socket.on('userLogin', (username, password) => {
+    if (socket.isConnected) return;
+
+    con.query(`SELECT id FROM user_info WHERE username='${username}' AND password='${password}';`, (err, result) => {
+      if(err) {
+        socket.emit('loginFeedback', 'An error occurs. Please retry.');
+        throw err;
+      };
+      
+      if(result.length !== 1) {
+        socket.emit('loginFeedback', 'Username or Password not valid!');
+        return;
+      };
+      
+      socket.isConnected = true;
+      socket.username = username;
+
+      socket.emit('loginFeedback');
+
+      
+
+    });
+  });
+
+      
+  socket.on('userSignup', (username, password) => {
+    if (socket.isConnected) return;
+
+    con.query(`SELECT id FROM user_info WHERE username='${username}' AND password='${password}';`, (err, result) => {
+      if(err) {
+        socket.emit('signupFeedback', 'An error occurs. Please retry.');
+        throw err;
+      };
+      
+      if(result.length > 0) {
+        socket.emit('signupFeedback', 'Username already used!');
+        return;
+      };
+      
+      con.query(`INSERT INTO user_info (username, password) VALUES ('${username}', '${password}')`, (err, result) => {
+        if(err) {
+          socket.emit('signupFeedback', 'An error occurs. Please retry.');
+          throw err;
+        };
+
+        con.query(`INSERT INTO user_stats (id) SELECT id FROM user_info WHERE username='${username}';`);
+
+        socket.isConnected = true;
+        socket.username = username;
+
+        socket.emit('signupFeedback');
+      });
+    });
+
+  });
+
+  socket.on('getElo', (username) => {
+    con.query(`SELECT user_elo FROM user_info left JOIN user_stats ON user_info.id = user_stats.id WHERE username='${username}';`, (err, result)=> {
+      if(err) throw err;
+      if(result.length === 0) return;
+      socket.emit('userElo', result[0].user_elo);
+    })
+  })
+
 });
 
 // Start the server
 const port = 3000;
 const hostname = '0.0.0.0'; // Listen on all network interfaces
 http.listen(port, hostname, () => {
+  con.connect((err) => {
+    if(err) throw err;
+    console.log('connected to SQL server as ' + con.threadId);
+  })
+  
   console.log(`Server listening on ${hostname}:${port}`);
 });

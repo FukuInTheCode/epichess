@@ -7,9 +7,9 @@
       <div class="user">
   
         <div class="user-info">
-          <img class="user-profile-picture" src="../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_01.png">
-          <p class="username"> {{ client.username }}</p>
-          
+          <img class="user-profile-picture" src="../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_07.png">
+          <p class="username"> {{ enemyUsername }}</p>
+          <p class="user-elo"> ({{ enemyElo }})</p>
         </div>
   
         <div class="timer">
@@ -23,7 +23,8 @@
       <div class="user">
         <div class="user-info">
           <img class="user-profile-picture" src="../assets/chess-pieces-sprites/2000px-Chess_Pieces_Sprite_01.png">
-          <p class="username"> {{ 'prout' }}</p>
+          <p class="username"> {{ this.client.username }}</p>
+          <p class="user-elo"> ({{ this.client.elo }})</p>
         </div>
 
         <div class="timer">
@@ -63,6 +64,13 @@
 
 
   export default {
+
+    data() {
+      return {
+        enemyUsername: 'Black',
+        enemyElo: 0,
+      }
+    },
     
     props: {
       client: { type: Object, required: true, default: () => ({})},
@@ -193,6 +201,10 @@
 
 .username {
   margin-left: 20px;
+}
+
+.user-elo {
+  margin-left: 10px;
 }
 
 .sketchContainer {

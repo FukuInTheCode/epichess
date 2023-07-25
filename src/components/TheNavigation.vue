@@ -4,16 +4,26 @@
           <!-- <img src="/path/to/your-home-icon.png" alt="Home" class="nav-icon"> -->
           <span class="nav-text">Home</span>
         </router-link>
-        <router-link to="/login">
+        <router-link v-if="!client.isConnected" to="/login">
           <!-- <img src="/path/to/your-login-icon.png" alt="Login" class="nav-icon"> -->
           <span class="nav-text">Login</span>
         </router-link>
-        <router-link to="/signup">
+        <router-link v-if="!client.isConnected" to="/signup">
           <!-- <img src="/path/to/your-signup-icon.png" alt="Sign Up" class="nav-icon"> -->
           <span class="nav-text">Sign Up</span>
         </router-link>
       </nav>
 </template>
+
+<script>
+export default {
+  props: {
+    client: { type: Object, required: true, default: ()=> ({}) },
+  }
+}
+
+</script>
+
 <style>
 /* Navigation Column Styles */
 .navbar {

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <TheNavigation />
+    <TheNavigation :client="client"/>
 
     <router-view :client="client"></router-view>
   </div>
@@ -26,7 +26,9 @@ export default {
         username: 'Anonymous156',
         socket: io('http://192.168.1.34:3000', { transports: ['websocket'] }),
         AlbegraicNotationArray: [],
-        isPlaying: [false]
+        isPlaying: [false],
+        isConnected: false,
+        elo: 0
       }
     }
   }, 
