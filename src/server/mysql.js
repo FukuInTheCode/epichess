@@ -3,10 +3,10 @@ const data = require('./private.json');
 
 
 let con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
+    host: data.host,
+    user: data.user,
     password: data.password,
-    database: 'epichessdb'
+    database: data.database
   });
 
 module.exports = {
