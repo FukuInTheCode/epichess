@@ -14,6 +14,7 @@ class GameManager {
     // eslint-disable-next-line
     initSocket(socket, isPlaying) {
         socket.on('enemyFound', (enemyID, isPlayerWhite) => {
+            socket.emit('getEnemyInfo');
             isPlaying[0] = true;
             this.handleEnemyFound(enemyID, isPlayerWhite);
             return;

@@ -5,12 +5,12 @@
         <span class="nav-text">Home</span>
       </router-link>
 
-      <router-link v-if="!client.isConnected" to="/login">
+      <router-link v-if="!client.isConnected && !client.isPlaying[0]" to="/login">
         <!-- <img src="/path/to/your-login-icon.png" alt="Login" class="nav-icon"> -->
         <span class="nav-text">Login</span>
       </router-link>
 
-      <router-link v-if="!client.isConnected" :to="'/signup'">
+      <router-link v-if="!client.isConnected && !client.isPlaying[0]" :to="'/signup'">
         <!-- <img src="/path/to/your-signup-icon.png" alt="Sign Up" class="nav-icon"> -->
         <span class="nav-text">Sign Up</span>
       </router-link>
@@ -20,7 +20,7 @@
         <span class="nav-text">Profile</span>
       </router-link>
 
-      <router-link to="/" @click="disconnect" v-if="client.isConnected">
+      <router-link to="/" @click="disconnect && !client.isPlaying[0]" v-if="client.isConnected">
         <span class="nav-text" id="disconnect-button">Disconnect</span>
       </router-link>
 

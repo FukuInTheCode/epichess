@@ -78,8 +78,6 @@
     },
 
     mounted() {
-
-      console.log(this.$route)
       gameManager.initSocket(this.client.socket, this.client.isPlaying);
 
       this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {
@@ -87,7 +85,12 @@
             this.client.AlgebraicNotationArray.push(AlgebraicNotation);
             gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying);
             return;
-        });
+      });
+
+      this.client.socket.on('enemyInfo', (enemyUsername, enemyElo)=>{
+        this.enemyUsername = enemyUsername;
+        this.enemyElo = enemyElo;
+      })
 
       this.sketch = new p5(this.createSketch, this.$refs.sketchContainer);
     },

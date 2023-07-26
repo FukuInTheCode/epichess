@@ -168,6 +168,36 @@ io.on('connection', (socket) => {
   socket.on('disconnectUser', ()=>{
     socket.isConnected = false;
     socket.username = null;
+  });
+
+
+  socket.on('getEnemyInfo', ()=>{
+    let tmpEnemy = clients.find(client => client.id === socket.enemyID);
+
+    let enemyUsername = 'Anonymous';
+    let enemyElo = 1000;
+
+    if(tmpEnemy.isConnected) con.query(`SELECT user_elo FROM user_stats 
+                                          JOIN user_info 
+                                            ON user_stats.id = user_info.id
+                                              WHERE username = '${tmpEnemy.username}'`,
+                                        (err, result)=>{
+                                          if(err) throw err;
+                                          enemyElo = result[0].user_elo;
+                                          enemyUsername= tmpEnemy.username;
+                                          socket.emit('enemyInfo', enemyUsername, enemyElo);
+                                        }); 
+  else if (socket.isConnected) con.query(`SELECT user_elo FROM user_stats 
+                                          JOIN user_info 
+                                            ON user_stats.id = user_info.id
+                                              WHERE username = '${socket.username}'`,
+                                        (err, result)=>{
+                                          if(err) throw err;
+                                          enemyElo = result[0].user_elo;
+                                          socket.emit('enemyInfo', enemyUsername, enemyElo);
+                                        });
+
+    
   })
 
 });
