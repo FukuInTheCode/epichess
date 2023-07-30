@@ -80,9 +80,10 @@
     mounted() {
       gameManager.initSocket(this.client.socket, this.client.isPlaying);
 
-      this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation) => {
+      this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation, BoardFEN) => {
             // eslint-disable-next-line
             this.client.AlgebraicNotationArray.push(AlgebraicNotation);
+            console.log(gameManager.board.fromFen(BoardFEN));
             gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying);
             return;
       });
@@ -155,7 +156,6 @@
         }
 
         sketch.mouseReleased = () => {
-          console.log(gameManager.board.toFen(gameManager.isPlayerTurn));
           gameManager.handleMouseReleased(sketch, this.client.socket, this.client.AlgebraicNotationArray);
         }  
 

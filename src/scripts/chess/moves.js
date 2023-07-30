@@ -48,6 +48,7 @@ class Move {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount += 1;
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
@@ -175,10 +176,12 @@ class BasePawnMove extends Move {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount = 0;
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
         board.resetEnpassant(piece.isWhite);
+
     }
     
 }
@@ -216,6 +219,7 @@ class FirstPawnMove extends BasePawnMove {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount = 0;
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
@@ -262,6 +266,7 @@ class BasePromotionPawnMove extends BasePawnMove {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount = 0;
         board.del(this.getNewDelVector(piece.vector));
         const tmp = this.getNewVector(piece.vector)
         board.add(new this.type(tmp.x, tmp.y, piece.isWhite));
@@ -313,6 +318,7 @@ class ShortCastle extends Move {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount += 1;
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
@@ -353,6 +359,7 @@ class LongCastle extends ShortCastle {
     }
 
     doWhateverThisMoveDo(piece, board) {
+        board.halfMovesCount += 1;
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;

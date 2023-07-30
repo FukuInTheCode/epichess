@@ -158,8 +158,10 @@ class GameManager {
 
     sendData(socket) {
         const listedBoard = this.board.boardToList();
+        const BoardFEN = this.board.toFen(!this.isPlayerWhite);
+        console.log(BoardFEN, 'envoyé');
         this.isPlayerTurn = false;
-        socket.emit('hasPlayed', listedBoard, this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length - 1]);
+        socket.emit('hasPlayed', listedBoard, this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length - 1], BoardFEN);
         return;
     }
 

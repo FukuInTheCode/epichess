@@ -8,6 +8,9 @@ class Board {
         this.blackPieces = [];
         this.size = size;
 
+        this.halfMovesCount = 0;
+        this.FullMovesCount = 1;
+
         this.AlgebraicNotationArray = [];
         this.setupPieces();
 
@@ -107,6 +110,8 @@ class Board {
         let i;
         let ret = new Board(this.size);
         ret.AlgebraicNotationArray = this.AlgebraicNotationArray;
+        ret.halfMovesCount = this.halfMovesCount;
+        ret.FullMovesCount = this.FullMovesCount;
         ret.whitePieces = [];
         ret.blackPieces = [];
         for(i = 0; i<this.whitePieces.length; i++) ret.whitePieces.push(this.whitePieces[i].clone());
@@ -122,6 +127,7 @@ class Board {
         } else {
             delete this.blackPieces.splice(this.blackPieces.indexOf(toDelete), 1);
         }
+        this.halfMovesCount = 0;
         return;
     }
 
@@ -220,8 +226,10 @@ class Board {
         let ret;
         ret = this.toFenPiecePlacement() + ' ';
         ret += this.toFenActiveColor(isWhite) + ' ';
-        ret += this.toFenCastlingRights();
-        
+        ret += this.toFenCastlingRights() + ' ';
+        ret += this.toFenEnPassantTarget(!isWhite) + ' ';
+        ret += this.toFenHalfMoves() + ' ';
+        ret += this.toFenFullMoves(!isWhite);
         return ret;
     }
 
@@ -252,29 +260,72 @@ class Board {
 
     toFenActiveColor(isWhite) {
         let ret;
-        if(isWhite) ret = 'w ';
-        else ret = 'b ';
+        if(isWhite) ret = 'w';
+        else ret = 'b';
 
         return ret;
     }
 
+    // certified too long but idc
     toFenCastlingRights() {
+        function check(tmpPiece, king) {
+            return (
+                tmpPiece !== null &&
+                tmpPiece.letter === 'R' &&
+                tmpPiece.isWhite === king.isWhite &&
+                tmpPiece.firstMove
+            )
+        }
+
         let ret = '';
-        let whiteKing = this.getPiecesByTeamAndLetter(true, 'K')[0];
+        let tmpKing = this.getPiecesByTeamAndLetter(true, 'K')[0];
 
-        if(whiteKing.firstMove) {
-            // eslint-disable-next-line
-            let tmpPiece = this.getPieceAt(createVector())
+        if(tmpKing !== null && tmpKing.firstMove) {
+            let tmpPiece = this.getPieceAt(createVector(0, tmpKing.vector.y));
+            if(check(tmpPiece, tmpKing)) ret += 'K';
+
+            tmpPiece = this.getPieceAt(createVector(this.size - 1, tmpKing.vector.y));
+            if(check(tmpPiece, tmpKing)) ret += 'Q';
         }
-        
+        tmpKing = this.getPiecesByTeamAndLetter(false, 'K')[0];
+        if(tmpKing !== null && tmpKing.firstMove) {
+            let tmpPiece = this.getPieceAt(createVector(0, tmpKing.vector.y));
+            if(check(tmpPiece, tmpKing)) ret += 'k';
 
-        let blackKing = this.getPiecesByTeamAndLetter(false, 'K')[0];
-
-        for(const move of blackKing.moves) {
-            if(move.getAlgebraicNotation(blackKing, this) === 'O-O') console.log(2);
+            tmpPiece = this.getPieceAt(createVector(this.size - 1, tmpKing.vector.y));
+            if(check(tmpPiece, tmpKing)) ret += 'q';
         }
-
         return ret;
+    }
+
+    toFenEnPassantTarget(isWhite) {
+
+        let tmpPieces = this.getPiecesByTeam(isWhite);
+
+        for(const piece of tmpPieces) {
+            if(piece.letter !== 'p') continue;
+            if(piece.enPassantVulnerable) {
+                if(isWhite) return String.fromCharCode(104 - piece.vector.x) + piece.vector.y.toString();
+                else return String.fromCharCode(104 - piece.vector.x) + (piece.vector.y + 2).toString();
+            }
+        }
+
+        return '-';
+
+    }
+
+    toFenHalfMoves() {
+        return this.halfMovesCount.toString();
+    }
+
+    toFenFullMoves(isPlayerWhite) {
+        if(!isPlayerWhite) this.FullMovesCount += 1;
+        return this.FullMovesCount.toString();
+    }
+
+    fromFen(fen) {
+        const parts = fen.split(' ');
+        console.log(parts);
     }
 }
 
