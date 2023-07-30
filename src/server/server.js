@@ -61,12 +61,12 @@ io.on('connection', (socket) => {
 
   });
 
-  socket.on('hasPlayed', (listedBoard, AlgebraicNotation, BoardFEN) => {
+  socket.on('hasPlayed', (AlgebraicNotation, BoardFEN) => {
     if (socket.id === null) return;
 
     let tmpEnemy = clients.filter(client => client.id === socket.enemyID)[0];
 
-    tmpEnemy.emit('enemyHasPlayed', listedBoard, AlgebraicNotation, BoardFEN);
+    tmpEnemy.emit('enemyHasPlayed', AlgebraicNotation, BoardFEN);
   });
 
   socket.on('lostByCheckmate', () => {

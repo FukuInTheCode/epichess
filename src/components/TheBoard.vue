@@ -80,10 +80,10 @@
     mounted() {
       gameManager.initSocket(this.client.socket, this.client.isPlaying);
 
-      this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation, BoardFEN) => {
+      this.client.socket.on('enemyHasPlayed', (AlgebraicNotation, BoardFEN) => {
             // eslint-disable-next-line
             this.client.AlgebraicNotationArray.push(AlgebraicNotation);
-            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying, BoardFEN);
+            gameManager.updateBoard(AlgebraicNotation, this.client.socket, this.client.isPlaying, BoardFEN);
             return;
       });
 
@@ -97,6 +97,11 @@
 
     beforeUnmount() {
       this.sketch.remove();
+      // eslint-disable-next-line
+      this.client.isPlaying[0] = false;
+      console.clear();
+      // eslint-disable-next-line
+      this.client.AlgebraicNotationArray = []
     },
 
     methods: {

@@ -41,21 +41,17 @@ class GameManager {
     }
   
     // Update the board with the received data
-    updateBoard(listedBoard, AlgebraicNotation, socket, isPlaying, fen) {
-        this.testFen(fen);
+    updateBoard(AlgebraicNotation, socket, isPlaying, fen) {
         this.board.fromFen(fen);
         this.isPlayerTurn = true;
         this.uiHandler.updateHTMLPlayerStatus('Your turn!');
-        // this.board.listToBoard(listedBoard);
         this.board.AlgebraicNotationArray.push(AlgebraicNotation);
 
-        
         if (this.amICheckmated()) {
             isPlaying[0] = false;
             socket.emit('lostByCheckmate');
             this.handleLostByCheckmate();
         }
-
         if (this.isPatByMaterial()) {
             isPlaying[0] = false;
             socket.emit('GameEndOnPat-NEM');
@@ -159,11 +155,9 @@ class GameManager {
     }
 
     sendData(socket) {
-        const listedBoard = this.board.boardToList();
         const BoardFEN = this.board.toFen(!this.isPlayerWhite);
-        console.log(BoardFEN, 'envoyé');
         this.isPlayerTurn = false;
-        socket.emit('hasPlayed', listedBoard, this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length - 1], BoardFEN);
+        socket.emit('hasPlayed', this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length - 1], BoardFEN);
         return;
     }
 
@@ -176,12 +170,6 @@ class GameManager {
         socket.emit('inResearch');
 
     }
-
-    testFen(fen) {
-        let testBoard = new Board(this.board.size);
-        testBoard.fromFen(fen);
-        console.log(fen);
-    }   
 
   }
 

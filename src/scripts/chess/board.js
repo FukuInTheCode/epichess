@@ -146,45 +146,6 @@ class Board {
             for (let piece of this.blackPieces) piece.enPassantVulnerable = false;
         }
     }
-    
-    boardToList() {
-        let ret = [];
-
-        for (const piece of this.whitePieces) {
-            ret.push([piece.letter, true, piece.vector, piece.firstMove, piece.enPassantVulnerable]);
-        }
-
-        for (const piece of this.blackPieces) {
-            ret.push([piece.letter, false, piece.vector, piece.firstMove, piece.enPassantVulnerable]);
-        }
-
-        return ret;
-    }
-
-    listToBoard(list) {
-        this.whitePieces = [];
-        this.blackPieces = [];
-
-        const letterToClassDict = {
-            'p': Pawn,
-            'K': King,
-            'Q': Queen,
-            'N': Knight,
-            'R': Rook,
-            'B': Bishop
-        };
-
-        for (let i = 0; i<list.length; i++) {
-            let tmpPiece = new letterToClassDict[list[i][0]](list[i][2].x, list[i][2].y, list[i][1], this.imgs);
-            tmpPiece.firstMove = list[i][3];
-            tmpPiece.enPassantVulnerable = list[i][4];
-            if (list[i][1]) this.whitePieces.push(tmpPiece);
-            else this.blackPieces.push(tmpPiece);
-        }
-
-        return;
-
-    }
 
     isCheckmated(team) {
         let tmpKing = this.getPiecesByTeamAndType(team, King)[0];
@@ -328,6 +289,8 @@ class Board {
         this.fromFenPiecePlacement(parts[0]);
         this.fromFenEnPassantTarget(parts[3], parts[1] === 'b');
         this.fromFenCastlingRights(parts[2]);
+        this.fromFenHalfMoves(parts[4]);
+        this.fromFenFullMoves(parts[5]);
     }
 
     fromFenPiecePlacement(part) {
@@ -365,7 +328,15 @@ class Board {
         this.getPieceAt(createVector(104 - part.charCodeAt(0), Number(part[1]) - (isBlack ? 0 : 2))).enPassantVulnerable = true;
     }
 
+    // Giga certified too long sry but idc
     fromFenCastlingRights(part) {
+        function check(piece, king) {
+            return (
+                piece &&
+                piece.letter === 'R' &&
+                piece.isWhite === king.isWhite
+            );
+        }
         let whiteKing = this.getPiecesByTeamAndLetter(true, 'K')[0];
         let blackKing = this.getPiecesByTeamAndLetter(false, 'K')[0];
         if(part === '-') {
@@ -373,7 +344,39 @@ class Board {
             blackKing.firstMove = false;
             return;
         }
+        let tmpPiece;
+        if(!part.includes('K')) {
+            tmpPiece = this.getPieceAt(createVector(0, whiteKing.vector.y));
+            if(check(tmpPiece, whiteKing)) tmpPiece.firstMove = false;
+            tmpPiece = this.getPieceAt(createVector(whiteKing.vector.x + 1, whiteKing.vector.y));
+            if(check(tmpPiece, whiteKing)) tmpPiece.firstMove = false;
+        }
+        if(!part.includes('Q')) {
+            tmpPiece = this.getPieceAt(createVector(this.size - 1, whiteKing.vector.y));
+            if(check(tmpPiece, whiteKing)) tmpPiece.firstMove = false;
+            tmpPiece = this.getPieceAt(createVector(whiteKing.vector.x - 1, whiteKing.vector.y));
+            if(check(tmpPiece, whiteKing)) tmpPiece.firstMove = false;
+        }
+        if(!part.includes('k')) {
+            tmpPiece = this.getPieceAt(createVector(0, blackKing.vector.y));
+            if(check(tmpPiece, blackKing)) tmpPiece.firstMove = false;
+            tmpPiece = this.getPieceAt(createVector(blackKing.vector.x + 1, blackKing.vector.y));
+            if(check(tmpPiece, blackKing)) tmpPiece.firstMove = false;
+        }
+        if(!part.includes('q')) {
+            tmpPiece = this.getPieceAt(createVector(this.size - 1, blackKing.vector.y));
+            if(check(tmpPiece, blackKing)) tmpPiece.firstMove = false;
+            tmpPiece = this.getPieceAt(createVector(blackKing.vector.x - 1, blackKing.vector.y));
+            if(check(tmpPiece, blackKing)) tmpPiece.firstMove = false;
+        }
+    }
 
+    fromFenHalfMoves(part) {
+        this.halfMovesCount = Number(part);
+    }
+
+    fromFenFullMoves(part) {
+        this.FullMovesCount = Number(part);
     }
 
 }
