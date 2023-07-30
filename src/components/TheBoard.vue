@@ -13,7 +13,7 @@
         </div>
   
         <div class="timer">
-          <p> Timer </p>
+          <p> {{ formattedEnemyTimer  }} </p>
         </div>
   
       </div>
@@ -28,7 +28,7 @@
         </div>
 
         <div class="timer">
-          <p> Timer </p>
+          <p> {{ formattedUserTimer }} </p>
         </div>
 
       </div>
@@ -69,21 +69,38 @@
       return {
         enemyUsername: 'Black',
         enemyElo: 0,
+        userTimer: 600,
+        enemyTimer: 600
       }
     },
     
     props: {
       client: { type: Object, required: true, default: () => ({})},
-      // socket, username
+    },
+
+    computed: {
+      formattedUserTimer() {
+        const minutes = Math.floor(this.userTimer / 60);
+        const seconds = this.userTimer % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      },
+
+      formattedEnemyTimer() {
+        const minutes = Math.floor(this.enemyTimer / 60);
+        const seconds = this.enemyTimer % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
     },
 
     mounted() {
-      gameManager.initSocket(this.client.socket, this.client.isPlaying);
+      gameManager.initSocket(this.client.socket, this.client.isPlaying, this.startUserTimer, this.stopUserTimer, this.startEnemyTimer, this.stopEnemyTimer);
 
       this.client.socket.on('enemyHasPlayed', (AlgebraicNotation, BoardFEN) => {
             // eslint-disable-next-line
             this.client.AlgebraicNotationArray.push(AlgebraicNotation);
             gameManager.updateBoard(AlgebraicNotation, this.client.socket, this.client.isPlaying, BoardFEN);
+            this.startUserTimer();
+            this.stopEnemyTimer();
             return;
       });
 
@@ -93,6 +110,7 @@
       })
 
       this.sketch = new p5(this.createSketch, this.$refs.sketchContainer);
+
     },
 
     beforeUnmount() {
@@ -101,10 +119,40 @@
       this.client.isPlaying[0] = false;
       console.clear();
       // eslint-disable-next-line
-      this.client.AlgebraicNotationArray = []
+      this.client.AlgebraicNotationArray = [];
+      this.stopUserTimer();
+      this.stopEnemyTimer();
+    },
+
+    watch: {
+      userTimer(newTimer) {
+        if(newTimer === 0){
+          gameManager.handleLoseOnTime();
+          this.stopUserTimer();
+        }
+      }
     },
 
     methods: {
+
+      startUserTimer() {
+        this.userTimerInterval = setInterval(() => {
+          this.userTimer--;
+        }, 1000);
+      },
+
+      startEnemyTimer() {
+        this.enemyTimerInterval = setInterval(() => {
+          this.enemyTimer--;
+        }, 1000);
+      },
+
+      stopUserTimer() {
+        clearInterval(this.userTimerInterval);
+      },
+      stopEnemyTimer() {
+        clearInterval(this.enemyTimerInterval);
+      },
 
       clickPlayButton() {
         // eslint-disable-next-line
@@ -160,7 +208,7 @@
         }
 
         sketch.mouseReleased = () => {
-          gameManager.handleMouseReleased(sketch, this.client.socket, this.client.AlgebraicNotationArray);
+          gameManager.handleMouseReleased(sketch, this.client.socket, this.client.AlgebraicNotationArray, this.stopUserTimer, this.startEnemyTimer);
         }  
 
       },

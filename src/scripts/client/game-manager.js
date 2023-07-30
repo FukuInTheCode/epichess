@@ -12,28 +12,36 @@ class GameManager {
         this.uiHandler = uiHandler;
     }
     // eslint-disable-next-line
-    initSocket(socket, isPlaying) {
+    initSocket(socket, isPlaying, startMe, stopMe, startHim, stopHim) {
         socket.on('enemyFound', (enemyID, isPlayerWhite) => {
             socket.emit('getEnemyInfo');
             isPlaying[0] = true;
+            if(isPlayerWhite) startMe();
+            else startHim();
             this.handleEnemyFound(enemyID, isPlayerWhite);
             return;
         });
 
         socket.on('enemyDisconnected', () => {
             isPlaying[0] = false;
+            stopHim();
+            stopMe();
             this.handleEnemyDisconnected();
             return;
         });
 
         socket.on('wonByCheckmate', () => {
             isPlaying[0] = false;
+            stopHim();
+            stopMe();
             this.handleWonByCheckmate();
             return;
         });
 
         socket.on('patNotEnoughtMaterial', () => {
             isPlaying[0] = false;
+            stopHim();
+            stopMe();
             this.handlePatByNotEnoughtMaterial()
         })
 
@@ -76,7 +84,7 @@ class GameManager {
     } 
 
 
-    handleMouseReleased(sketch, socket, arr) {
+    handleMouseReleased(sketch, socket, arr, stopMe, startHim) {
 
         if (!this.dragged) return;
 
@@ -87,7 +95,8 @@ class GameManager {
                 this.uiHandler.show(this, sketch);
 
                 arr.push(this.board.AlgebraicNotationArray[this.board.AlgebraicNotationArray.length-1]);
-                
+                stopMe();
+                startHim();
                 this.sendData(socket);
 
                 if (this.isPlayerWhite) this.uiHandler.updateHTMLPlayerStatus('Black turn!');
@@ -169,6 +178,10 @@ class GameManager {
 
         socket.emit('inResearch');
 
+    }
+
+    handleLoseOnTime() {
+        console.log('loseOnTime');
     }
 
   }

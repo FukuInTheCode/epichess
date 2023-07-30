@@ -1,7 +1,6 @@
 class UIHandler {
     constructor() {
-        this.clientStatus = "Idling";
-        this.isReversed = false;
+        this.isReversed = true;
     }
 
         

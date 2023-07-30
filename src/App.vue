@@ -28,7 +28,7 @@ export default {
         AlbegraicNotationArray: [],
         isPlaying: [false],
         isConnected: false,
-        elo: 0
+        elo: 0,
       }
     }
   },
