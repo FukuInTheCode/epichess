@@ -1,3 +1,4 @@
+import { Queen } from './pieces';
 import { createVector } from './vector';
 
 const boardSize = 8;
@@ -245,7 +246,7 @@ class EnPassantMove extends BasePawnMove {
 }
 
 class BasePromotionPawnMove extends BasePawnMove {
-    constructor(d, del_d = null, type) {
+    constructor(d, del_d = null, type = Queen) {
         super(d, del_d);
         this.type = type;
     }
@@ -304,9 +305,9 @@ class ShortCastle extends Move {
             board.getPieceAt(vector).firstMove &&
             !board.getPieceAt(vector).isAttacked(board) &&
             !tmpKing.isAttacked(board) &&
-            board.isPieceAt(createVector(board.size - 1, vector.y)) &&
-            board.getPieceAt(createVector(board.size - 1, vector.y)).letter === 'R' &&
-            board.getPieceAt(createVector(board.size - 1, vector.y)).firstMove
+            board.isPieceAt(createVector(0, vector.y)) &&
+            board.getPieceAt(createVector(0, vector.y)).letter === 'R' &&
+            board.getPieceAt(createVector(0, vector.y)).firstMove
 
         )
     }
@@ -315,8 +316,8 @@ class ShortCastle extends Move {
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
-        board.getPieceAt(createVector(board.size -1, piece.vector.y)).firstMove = false;
-        board.getPieceAt(createVector(board.size -1, piece.vector.y)).vector = createVector(piece.vector.x - 1 , piece.vector.y);
+        board.getPieceAt(createVector(0, piece.vector.y)).firstMove = false;
+        board.getPieceAt(createVector(0, piece.vector.y)).vector = createVector(piece.vector.x + 1 , piece.vector.y);
         board.resetEnpassant(piece.isWhite);
     }
 
@@ -344,9 +345,9 @@ class LongCastle extends ShortCastle {
             board.getPieceAt(vector).firstMove &&
             !board.getPieceAt(vector).isAttacked(board) &&
             !tmpKing.isAttacked(board) &&
-            board.isPieceAt(createVector(0, vector.y)) &&
-            board.getPieceAt(createVector(0, vector.y)).letter === 'R' &&
-            board.getPieceAt(createVector(0, vector.y)).firstMove
+            board.isPieceAt(createVector(board.size - 1, vector.y)) &&
+            board.getPieceAt(createVector(board.size - 1, vector.y)).letter === 'R' &&
+            board.getPieceAt(createVector(board.size - 1, vector.y)).firstMove
 
         )
     }
@@ -355,8 +356,8 @@ class LongCastle extends ShortCastle {
         board.del(this.getNewDelVector(piece.vector));
         piece.vector = this.getNewVector(piece.vector);
         piece.firstMove = false;
-        board.getPieceAt(createVector(0, piece.vector.y)).firstMove = false;
-        board.getPieceAt(createVector(0, piece.vector.y)).vector = createVector(piece.vector.x + 1 , piece.vector.y);
+        board.getPieceAt(createVector(board.size - 1, piece.vector.y)).firstMove = false;
+        board.getPieceAt(createVector(board.size - 1, piece.vector.y)).vector = createVector(piece.vector.x - 1 , piece.vector.y);
         board.resetEnpassant(piece.isWhite);
     }
 

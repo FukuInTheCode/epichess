@@ -155,6 +155,7 @@
         }
 
         sketch.mouseReleased = () => {
+          console.log(gameManager.board.toFen(gameManager.isPlayerTurn));
           gameManager.handleMouseReleased(sketch, this.client.socket, this.client.AlgebraicNotationArray);
         }  
 

@@ -1,4 +1,5 @@
 import { King, Queen, Rook, Bishop, Knight, Pawn } from './pieces.js';
+import { createVector } from './vector.js';
 
 
 class Board {
@@ -46,8 +47,8 @@ class Board {
         
     }
 
-    show(sketch, isReversed){
 
+    show(sketch, isReversed){
         let i, j;
         for (i = 0; i < 8; i++) {
             for (j = 0; j < 8; j++) {
@@ -213,6 +214,67 @@ class Board {
 
         return true;
 
+    }
+
+    toFen(isWhite) {
+        let ret;
+        ret = this.toFenPiecePlacement() + ' ';
+        ret += this.toFenActiveColor(isWhite) + ' ';
+        ret += this.toFenCastlingRights();
+        
+        return ret;
+    }
+
+    toFenPiecePlacement() {
+        let ret = '';
+        for(let y=7; y>-1; y--) {
+            let blankSquareCount = 0;
+            for(let x=7;x>-1; x--) {
+                if(this.isPieceAt(createVector(x, y)) === false) {
+                    blankSquareCount++;
+                    continue;
+                }
+
+                if(blankSquareCount !== 0) {
+                    ret+=blankSquareCount;
+                    blankSquareCount = 0; 
+                }
+
+                if(this.getPieceAt(createVector(x, y)).isWhite) ret+= this.getPieceAt(createVector(x, y)).letter.toUpperCase()
+                else ret+= this.getPieceAt(createVector(x, y)).letter.toLowerCase();
+            }
+            if(blankSquareCount !== 0) ret+= blankSquareCount;
+            ret += '/';
+        }
+
+        return ret;
+    }
+
+    toFenActiveColor(isWhite) {
+        let ret;
+        if(isWhite) ret = 'w ';
+        else ret = 'b ';
+
+        return ret;
+    }
+
+    toFenCastlingRights() {
+        let ret = '';
+        let whiteKing = this.getPiecesByTeamAndLetter(true, 'K')[0];
+
+        if(whiteKing.firstMove) {
+            // eslint-disable-next-line
+            let tmpPiece = this.getPieceAt(createVector())
+        }
+        
+
+        let blackKing = this.getPiecesByTeamAndLetter(false, 'K')[0];
+
+        for(const move of blackKing.moves) {
+            if(move.getAlgebraicNotation(blackKing, this) === 'O-O') console.log(2);
+        }
+
+        return ret;
     }
 }
 

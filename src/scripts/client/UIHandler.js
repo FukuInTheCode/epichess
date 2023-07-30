@@ -1,12 +1,7 @@
 class UIHandler {
     constructor() {
         this.clientStatus = "Idling";
-        this.isReversed = true;
-
-        this.username = 'Fukumi';
-
-        this.enemyUsername = 'Bad Player';
-
+        this.isReversed = false;
     }
 
         

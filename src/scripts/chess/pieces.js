@@ -91,8 +91,8 @@ class King extends Piece {
         else this.imgIndex = 6;
         this.score = 1000;
 
-        this.moves.push(new ShortCastle(createVector(2, 0)));
-        this.moves.push(new LongCastle(createVector(-2, 0)));
+        this.moves.push(new ShortCastle(createVector(-2, 0)));
+        this.moves.push(new LongCastle(createVector(2, 0)));
 
 
     }
