@@ -295,7 +295,7 @@ class Board {
             tmpPiece = this.getPieceAt(createVector(this.size - 1, tmpKing.vector.y));
             if(check(tmpPiece, tmpKing)) ret += 'q';
         }
-        return ret;
+        return ret !== '' ? ret : '-';
     }
 
     toFenEnPassantTarget(isWhite) {
@@ -325,8 +325,57 @@ class Board {
 
     fromFen(fen) {
         const parts = fen.split(' ');
-        console.log(parts);
+        this.fromFenPiecePlacement(parts[0]);
+        this.fromFenEnPassantTarget(parts[3], parts[1] === 'b');
+        this.fromFenCastlingRights(parts[2]);
     }
+
+    fromFenPiecePlacement(part) {
+        const types = {
+            'P': Pawn,
+            'K': King,
+            'Q': Queen,
+            'N': Knight,
+            'R': Rook,
+            'B': Bishop
+        };
+        this.whitePieces = [];
+        this.blackPieces = [];
+        const rows = part.split('/');
+        let y = this.size - 1;
+        for(const row of rows) {
+            let x = this.size - 1;
+            for(const letter of row) {
+                if(!isNaN(Number(letter))){
+                    x -= Number(letter);
+                    continue;
+                }
+
+                if(letter.toUpperCase() === letter) this.whitePieces.push(new types[letter](x, y, true, letter === 'P' ? 'p' : letter));
+                else this.blackPieces.push(new types[letter.toUpperCase()](x, y, false, letter.toUpperCase() === 'P' ? 'p' : letter.toUpperCase()));
+
+                x--;
+            }
+            y--;
+        }
+    }
+
+    fromFenEnPassantTarget(part, isBlack) {
+        if(part === '-') return;
+        this.getPieceAt(createVector(104 - part.charCodeAt(0), Number(part[1]) - (isBlack ? 0 : 2))).enPassantVulnerable = true;
+    }
+
+    fromFenCastlingRights(part) {
+        let whiteKing = this.getPiecesByTeamAndLetter(true, 'K')[0];
+        let blackKing = this.getPiecesByTeamAndLetter(false, 'K')[0];
+        if(part === '-') {
+            whiteKing.firstMove = false;
+            blackKing.firstMove = false;
+            return;
+        }
+
+    }
+
 }
 
 export { Board };

@@ -41,10 +41,12 @@ class GameManager {
     }
   
     // Update the board with the received data
-    updateBoard(listedBoard, AlgebraicNotation, socket, isPlaying) {
+    updateBoard(listedBoard, AlgebraicNotation, socket, isPlaying, fen) {
+        this.testFen(fen);
+        this.board.fromFen(fen);
         this.isPlayerTurn = true;
         this.uiHandler.updateHTMLPlayerStatus('Your turn!');
-        this.board.listToBoard(listedBoard);
+        // this.board.listToBoard(listedBoard);
         this.board.AlgebraicNotationArray.push(AlgebraicNotation);
 
         
@@ -173,9 +175,13 @@ class GameManager {
 
         socket.emit('inResearch');
 
-
-
     }
+
+    testFen(fen) {
+        let testBoard = new Board(this.board.size);
+        testBoard.fromFen(fen);
+        console.log(fen);
+    }   
 
   }
 

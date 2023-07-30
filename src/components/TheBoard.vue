@@ -83,8 +83,7 @@
       this.client.socket.on('enemyHasPlayed', (listedBoard, AlgebraicNotation, BoardFEN) => {
             // eslint-disable-next-line
             this.client.AlgebraicNotationArray.push(AlgebraicNotation);
-            console.log(gameManager.board.fromFen(BoardFEN));
-            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying);
+            gameManager.updateBoard(listedBoard, AlgebraicNotation, this.client.socket, this.client.isPlaying, BoardFEN);
             return;
       });
 

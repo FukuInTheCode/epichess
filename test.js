@@ -1,0 +1,1 @@
+console.log('e3'.charCodeAt(0));
